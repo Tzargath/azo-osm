@@ -20,16 +20,7 @@ Metropolii (GZM). Pełna procedura + skrypty QGIS do odtworzenia dla dowolnego o
 - **OSP / zarządy gminne** — pokazanie roli jednostek KSRG w domykaniu luk JRG.
 - **Dziennikarze, samorządy, studenci, pasjonaci GIS** — powtarzalna metoda na otwartych danych.
 
-## 🗺️ Co pokazują mapy
-
-| | |
-|---|---|
-| ![Kontekst](figury/A_kontekst.png) | **A. Kontekst** — gęstość zaludnienia (gmina), tereny przemysłowe, autostrady/ekspresowe/krajowe, tunele oraz **wszystkie jednostki: JRG / OSP-KSRG / OSP**. |
-| ![Zasięg JRG](figury/B_zasieg_JRG.png) | **B. Zasięg JRG** — izochrony **8 i 15 min** dojazdu drogami od zawodowych jednostek PSP; **białe pola = poza zasięgiem**. |
-| ![Zasięg JRG+KSRG](figury/C_zasieg_JRG_KSRG.png) | **C. Zasięg JRG + OSP w KSRG** — jak ochotnicy w krajowym systemie ratowniczym domykają luki; ramka z porównaniem. |
-| ![Rdzeń GZM](figury/D_rdzen_GZM.png) | **D. Zbliżenie na metropolię** — zasięg, sieć dróg i tunele (DTŚ) na podkładzie OSM z nazwami dzielnic i ulic. |
-
-## 🖼️ Ryciny z artykułu (analiza 15-min)
+## 🗺️ Co pokazują ryciny (analiza 15-min)
 
 Sfinalizowane ryciny z opracowania metodycznego (próg dotarcia **15 min**; jednostki KSRG: **50 JRG + 230 OSP-KSRG**; prędkości planistyczne KG PSP 75/60/50/30 km/h, alarmowanie 3/10 min).
 
@@ -40,17 +31,18 @@ Sfinalizowane ryciny z opracowania metodycznego (próg dotarcia **15 min**; jedn
 | ![Ryc. 3 — mapa różnicy](figury_art/Ryc3_mapa_roznicy.jpg) | **Ryc. 3. Mapa różnicy (widmo)** — obszary zaliczone tylko przez bufor stały, odrzucone przez konstrukcję metodyczną (**1 288 km²**); nadwyżka rozkłada się wzdłuż sieci dróg. |
 | ![Ryc. 4 — dekompozycja](figury_art/Ryc4_dekompozycja.jpg) | **Ryc. 4. Dekompozycja** wpływu decyzji metodycznych na wskaźnik pokrycia (15 min, p.p.): prędkości −9,5; bufor malejący + ostatni odcinek −4,8; alarmowanie −3,8; bariery −1,2. |
 
-## 📊 Wynik dla woj. śląskiego (szacunek, ~4,09 mln mieszkańców)
+## 📊 Wynik dla woj. śląskiego (analiza 15-min, ~4,06 mln mieszk., siatka popytu 2 km; jednostki KSRG: 50 JRG + 230 OSP-KSRG)
 
-| zasięg dojazdu | tylko JRG (50) | JRG + OSP-KSRG (280) |
-|---|---|---|
-| ≤ 8 min  | ~48 % | **~63 %** |
-| ≤ 15 min | ~63 % | ~67 % |
-| poza 15 min | ~37 % (1,5 mln) | ~33 % (1,35 mln) |
+| metoda (próg dotarcia 15 min) | pokrycie ludności |
+|---|---|
+| naiwny — bufor stały 250 m | **58,0 %** |
+| metodyczny — bufor malejący + bariery + ostatni odcinek | **48,3 %** |
+| różnica (zawyżenie metody naiwnej) | **9,7 p.p.** ≈ widmo **1 288 km²** |
 
-**Wniosek:** jednostki OSP w KSRG niemal **podwajają pokrycie 8-minutowe**, ale przy 15 min dokładają
-niewiele — nieosiągnięci mieszkańcy są **rozproszeni po terenach wiejskich** (zasięg 15 min po samej
-sieci dróg rośnie z 82 % do 96 % długości dróg, ale mieszka tam mało ludzi).
+**Wniosek:** uproszczony bufor stały **zawyża** pokrycie 15-minutowe o ~9,7 p.p. względem metodyki, która
+uwzględnia malejący zasięg dojścia, bariery (rzeki, tory) i realne dojście poza drogą. Zawyżenie („widmo",
+1 288 km²) rozkłada się wzdłuż sieci dróg — tam, gdzie naiwny bufor 250 m dorysowuje zasięg, którego model
+dojścia nie potwierdza. Pełna dekompozycja wpływu poszczególnych decyzji metodycznych → **Ryc. 4**.
 
 ## 🧭 Jak czytać mapę
 
@@ -163,9 +155,11 @@ Aby zbliżyć szkic do realnej AZO:
 04_build_map.py        ładowanie i stylizacja warstw
 docs/QNEAT3_izochrony.md  izochrony bez skryptów — wtyczka QNEAT3 (dla PSP)
 qgis_plugin/           wtyczka QGIS „Izochrony AZO (PSP)" + gotowy ZIP do instalacji
-azo_gzm.qgz            projekt QGIS z 4 kompozycjami wydruku (AZO_A…D)
+azo_art.qgz            projekt QGIS z rycinami artykułu (layouty RYC1…RYC4)
+azo_gzm.qgz            projekt QGIS — demo metody (kompozycje AZO_A…D)
+figury_art/            ryciny artykułu (Ryc1…Ryc4, analiza 15-min)  ← w repo
 data3857/              warstwy wyświetlania (EPSG:3857)  ← w repo
-figury/                gotowe mapy PNG + PDF             ← w repo
+figury/                mapy demo metody (PNG/PDF, AZO_A…D)  ← w repo
 data/                  warstwy robocze (generowane skryptem 1) — w .gitignore
 ```
 
