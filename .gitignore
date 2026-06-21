@@ -1,0 +1,32 @@
+# Warstwy robocze generowane przez 01_fetch_osm.py / 02_isochrones.py (duże, odtwarzalne)
+data/
+data3857/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Paczka wtyczki (budowana skryptem)
+azo_izochrony*.zip
+
+# Pliki pośrednie / sesyjne
+*.osm
+*_34.gpkg
+edges*.gpkg
+nodes_*.gpkg
+*.log
+*.DONE
+layer_ids.json
+
+# QGIS
+*.qgz~
+*.qgs~
+.qgis_backup/
+
+# System
+.DS_Store
+Thumbs.db
+
+# Wewnętrzne backupy (nie publiczne)
+_archive/
