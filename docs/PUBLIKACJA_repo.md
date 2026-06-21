@@ -52,8 +52,8 @@ Sanity-check przed pushem: `git ls-files | grep -E '^data/|\.osm$' ` musi być *
 ### A. Szybko: ZIP + GitHub Release
 ```bash
 ./build_plugin_zip.sh                       # → azo_izochrony-1.6.1.zip
-gh release create v1.6.1 azo_izochrony-1.6.1.zip -t "Izochrony AZO v1.6.1" \
-   -n "A/S (autostrady/ekspresówki) bez dojścia poza drogą + automatyczna naprawa geometrii barier (fixgeometries)."
+gh release create v1.6.1 azo_izochrony-1.6.1.zip -t "Izochrony AZO v1.6.1 (QGIS 4 / Qt6)" \
+   -n "Kompatybilność z QGIS 4 / Qt6 (qgisMaximumVersion=4.99, supportsQt6) — bez zmian funkcjonalnych względem 1.6.0."
 ```
 Użytkownik instaluje w QGIS: **Wtyczki → Zarządzaj i instaluj → Zainstaluj z ZIP**.
 
