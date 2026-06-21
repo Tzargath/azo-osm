@@ -3,7 +3,7 @@
 Stan przygotowania (✅ zrobione automatycznie):
 - `.gitignore` wyklucza `data/` (519 MB), `data3857/` (23 MB), `__pycache__/`, `*.pyc`, paczki `*.zip` — repo będzie lekkie i odtwarzalne.
 - Skan sekretów: **czysto** (zero tokenów/kluczy/haseł poza `data/`).
-- `metadata.txt`: autor **Tomasz Zuchlke**, email `tomasz.zuchlke@ultraflow.run`, wersja **1.6.0**.
+- `metadata.txt`: autor **Tomasz Zuchlke**, email `tomasz.zuchlke@ultraflow.run`, wersja **1.6.1**.
 - `LICENSE` (MIT, © 2026 Tomasz Zuchlke) i `README.md` na miejscu.
 - Skrypt `build_plugin_zip.sh` buduje paczkę wtyczki gotową do instalacji/Release.
 
@@ -34,7 +34,7 @@ cd ~/azo_gzm
 git init -b main
 git add .
 git status            # ZWERYFIKUJ: czy nie wchodzi data/ ani nic wrażliwego
-git commit -m "AZO: pipeline OSM + wtyczka QGIS Izochrony AZO (PSP) v1.6.0"
+git commit -m "AZO: pipeline OSM + wtyczka QGIS Izochrony AZO (PSP) v1.6.1"
 
 # utwórz repo na GitHub (jednorazowo) i podłącz:
 gh repo create Tzargath/azo-osm --public --source=. --remote=origin --push
@@ -51,8 +51,8 @@ Sanity-check przed pushem: `git ls-files | grep -E '^data/|\.osm$' ` musi być *
 
 ### A. Szybko: ZIP + GitHub Release
 ```bash
-./build_plugin_zip.sh                       # → azo_izochrony-1.6.0.zip
-gh release create v1.6.0 azo_izochrony-1.6.0.zip -t "Izochrony AZO v1.6.0" \
+./build_plugin_zip.sh                       # → azo_izochrony-1.6.1.zip
+gh release create v1.6.1 azo_izochrony-1.6.1.zip -t "Izochrony AZO v1.6.1" \
    -n "A/S (autostrady/ekspresówki) bez dojścia poza drogą + automatyczna naprawa geometrii barier (fixgeometries)."
 ```
 Użytkownik instaluje w QGIS: **Wtyczki → Zarządzaj i instaluj → Zainstaluj z ZIP**.
@@ -61,7 +61,7 @@ Użytkownik instaluje w QGIS: **Wtyczki → Zarządzaj i instaluj → Zainstaluj
 Zasięg: widoczna dla wszystkich w Menedżerze wtyczek QGIS.
 1. Konto na https://plugins.qgis.org (OSGEO ID).
 2. Wymogi metadanych (✅ mamy): `name, qgisMinimumVersion, description, version, author, email, about, repository`. Dodaj `experimental=False` (jest).
-3. **Upload** `azo_izochrony-1.6.0.zip` → „Share a plugin". Po zatwierdzeniu aktualizacje idą przez kolejne uploady ZIP z podbitą wersją.
+3. **Upload** `azo_izochrony-1.6.1.zip` → „Share a plugin". Po zatwierdzeniu aktualizacje idą przez kolejne uploady ZIP z podbitą wersją.
 
 ---
 
