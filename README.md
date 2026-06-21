@@ -29,6 +29,17 @@ Metropolii (GZM). Pełna procedura + skrypty QGIS do odtworzenia dla dowolnego o
 | ![Zasięg JRG+KSRG](figury/C_zasieg_JRG_KSRG.png) | **C. Zasięg JRG + OSP w KSRG** — jak ochotnicy w krajowym systemie ratowniczym domykają luki; ramka z porównaniem. |
 | ![Rdzeń GZM](figury/D_rdzen_GZM.png) | **D. Zbliżenie na metropolię** — zasięg, sieć dróg i tunele (DTŚ) na podkładzie OSM z nazwami dzielnic i ulic. |
 
+## 🖼️ Ryciny z artykułu (analiza 15-min)
+
+Sfinalizowane ryciny z opracowania metodycznego (próg dotarcia **15 min**; jednostki KSRG: **50 JRG + 230 OSP-KSRG**; prędkości planistyczne KG PSP 75/60/50/30 km/h, alarmowanie 3/10 min).
+
+| | |
+|---|---|
+| ![Ryc. 1 — obszar badań](figury_art/Ryc1_obszar_badan.jpg) | **Ryc. 1. Obszar badań** — jednostki KSRG i sieć drogowa wg kategorii prędkości planistycznych oraz bariery (rzeki, tory). |
+| ![Ryc. 2 — porównanie metod](figury_art/Ryc2_porownanie_metod.jpg) | **Ryc. 2. Porównanie metod (15 min)** — (a) naiwny bufor stały 250 m (**58,0 %**) vs (b) bufor malejący + bariery + ostatni odcinek (**48,3 %**); model dojazdu identyczny w obu, różni się tylko konstrukcja powierzchni. |
+| ![Ryc. 3 — mapa różnicy](figury_art/Ryc3_mapa_roznicy.jpg) | **Ryc. 3. Mapa różnicy (widmo)** — obszary zaliczone tylko przez bufor stały, odrzucone przez konstrukcję metodyczną (**1 288 km²**); nadwyżka rozkłada się wzdłuż sieci dróg. |
+| ![Ryc. 4 — dekompozycja](figury_art/Ryc4_dekompozycja.jpg) | **Ryc. 4. Dekompozycja** wpływu decyzji metodycznych na wskaźnik pokrycia (15 min, p.p.): prędkości −9,5; bufor malejący + ostatni odcinek −4,8; alarmowanie −3,8; bariery −1,2. |
+
 ## 📊 Wynik dla woj. śląskiego (szacunek, ~4,09 mln mieszkańców)
 
 | zasięg dojazdu | tylko JRG (50) | JRG + OSP-KSRG (280) |
