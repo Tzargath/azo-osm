@@ -1,14 +1,25 @@
-# Izochrony AZO (PSP) — wtyczka QGIS (v1.3.0)
+# Izochrony AZO (PSP) — wtyczka QGIS
 
 Analiza zabezpieczenia operacyjnego straży: **jak szybko jednostki docierają na miejsce zdarzenia
-i ile osób mieści się w tym zasięgu.** Dodaje do panelu **Processing** dwa narzędzia (grupa
+i ile osób mieści się w tym zasięgu.** Dodaje do panelu **Processing** trzy narzędzia (grupa
 *AZO — zabezpieczenie operacyjne → Analiza sieciowa*). W pełni **offline, bez kluczy API** —
 odpowiednie dla danych służbowych.
 
+Wymaga **QGIS 3.22 lub nowszego** (działa też na QGIS 4 / Qt6).
+
 ## Instalacja
-- **Z pliku ZIP:** `Wtyczki → Zarządzaj wtyczkami → Zainstaluj z ZIP →` wskaż `azo_izochrony.zip`.
-- **Ręcznie:** skopiuj katalog `azo_izochrony/` do `…/QGIS3/profiles/default/python/plugins/`,
+- **Z oficjalnego repozytorium QGIS (zalecane):**
+  `Wtyczki → Zarządzaj wtyczkami i zainstaluj → Wszystkie →` wpisz **„Izochrony AZO"**.
+  Strona wtyczki: <https://plugins.qgis.org/plugins/azo_izochrony/>. Ta droga sama zgłasza aktualizacje.
+- **Z pliku ZIP:** pobierz paczkę z <https://github.com/Tzargath/azo-osm/releases>, a potem
+  `Wtyczki → Zarządzaj wtyczkami → Zainstaluj z ZIP`.
+- **Ręcznie:** skopiuj katalog `azo_izochrony/` do katalogu profilu QGIS —
+  `…/QGIS3/profiles/default/python/plugins/` (QGIS 3.x) albo `…/QGIS4/…` (QGIS 4) —
   uruchom ponownie QGIS i włącz wtyczkę.
+
+> **Numeru wersji nie ma w tym nagłówku celowo.** Stał tu „v1.3.0", gdy wtyczka była
+> już 1.6.2. Jedynym źródłem wersji jest `metadata.txt` — plik, który i tak trzeba
+> podbić przy wydaniu, więc nie ma jak się rozjechać.
 
 ---
 
@@ -32,6 +43,19 @@ powierzchni: dla każdego punktu sprawdza `czas_dojazdu_do_najbliższej_drogi + 
 dojścia przecinające barierę. Wynik: warstwa punktów (pole `lud`, `czas_min`, `pokr_<T>min`) oraz
 zestawienie %% w logu. Dokładniejsze i tańsze niż liczenie z mapy, odporne na bariery.
 
+## Narzędzie 3 — „Pokrycie ludności wg jednostek (powiaty/gminy)" → TABELA I MAPA
+Dla **każdego poligonu administracyjnego** (powiat, gmina, obręb) liczy % mieszkańców w zasięgu T
+i wpisuje wynik **do tabeli atrybutów**. Ludność bierze z punktów popytu (waga), więc
+`% = ludność objęta w poligonie ÷ ludność w poligonie` — nie z przecięcia powierzchni.
+Wynik jest kolorowany gradientem zieleni wg % i podpisany na środku poligonu jako „nazwa — XX%".
+Liczy superwęzłem i respektuje bariery, tak samo jak narzędzia 1 i 2.
+
+Wejście: sieć dróg, jednostki, punkty popytu **i poligony** — wszystko w układzie metrycznym
+(UTM / EPSG:2180). Progi w minutach, np. `8,15`.
+
+**Po co, skoro jest Narzędzie 2:** narzędzie 2 daje **jedną liczbę dla całego obszaru**, to daje
+**rozkład** — które gminy wypadają źle. To jest ta tabela, którą realnie wkleja się do AZO.
+
 ---
 
 ## Silnik
@@ -41,7 +65,7 @@ zestawienie %% w logu. Dokładniejsze i tańsze niż liczenie z mapy, odporne na
   minuty → kilkadziesiąt sekund.
 - **Wątek w tle** (Processing) — QGIS nie zamarza, działa pasek postępu i anulowanie.
 
-## Parametry (wspólne dla obu narzędzi)
+## Parametry (wspólne dla wszystkich trzech narzędzi)
 | parametr | opis |
 |---|---|
 | Sieć dróg | linie w układzie **metrycznym** (UTM/EPSG:2180, nie 4326) |
@@ -52,7 +76,8 @@ zestawienie %% w logu. Dokładniejsze i tańsze niż liczenie z mapy, odporne na
 | Progi czasu [min] | np. `8,15` |
 | Prędkość dojścia [km/h], `R_max` [m] | „ostatni odcinek" poza drogą |
 | Bariery | opcjonalne (rzeki, tory) |
-| *(Narz. 2)* Punkty popytu + pole ludności | siatka/budynki z wagą; puste = po 1 |
+| *(Narz. 2 i 3)* Punkty popytu + pole ludności | siatka/budynki z wagą; puste = po 1 |
+| *(Narz. 3)* Poligony administracyjne + pole nazwy | powiaty/gminy/obręby, układ metryczny |
 
 ## Cechy
 - **Offline, bez API** — bezpieczne dla danych służbowych.

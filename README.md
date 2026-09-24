@@ -4,6 +4,11 @@
 OpenStreetMap.** Przykład: województwo śląskie z wyróżnieniem Górnośląsko-Zagłębiowskiej
 Metropolii (GZM). Pełna procedura + skrypty QGIS do odtworzenia dla dowolnego obszaru.
 
+> **Nie chcesz czytać całości? Zainstaluj wtyczkę.**
+> **[Izochrony AZO (PSP)](https://plugins.qgis.org/plugins/azo_izochrony/)** jest w oficjalnym
+> repozytorium wtyczek QGIS — `Wtyczki → Zarządzaj wtyczkami → Wszystkie → „Izochrony AZO"`.
+> Liczy to samo co skrypty z tego repo, offline i bez kluczy API.
+
 > [!WARNING]
 > **Materiał poglądowy / edukacyjny — NIE jest urzędową Analizą Zabezpieczenia Operacyjnego.**
 > Dane o jednostkach pochodzą z OpenStreetMap i bywają niepełne lub nieaktualne. Do zastosowań
@@ -104,7 +109,23 @@ W katalogu [`qgis_plugin/`](qgis_plugin/) jest gotowa **wtyczka QGIS „Izochron
 dodaje do Processing algorytm **„Izochrony dojazdu (AZO)"** — ta sama metoda (graf + Dijkstra + bufor)
 co skrypty, ale **klikalnie**, z paskiem postępu i **trybem jazdy alarmowej**. W pełni offline, bez API.
 
-**Instalacja:** `Wtyczki → Zarządzaj wtyczkami → Zainstaluj z ZIP →` wskaż `qgis_plugin/azo_izochrony.zip`.
+### Instalacja
+
+**Zalecana — z oficjalnego repozytorium QGIS.** Wtyczka jest opublikowana na
+**[plugins.qgis.org/plugins/azo_izochrony](https://plugins.qgis.org/plugins/azo_izochrony/)**,
+więc instaluje się jak każda inna i **sama zgłasza aktualizacje**:
+
+`Wtyczki → Zarządzaj wtyczkami i zainstaluj → Wszystkie →` wpisz **„Izochrony AZO"** → `Zainstaluj`
+
+**Alternatywnie — z paczki Release.** Pobierz ZIP z
+**[Releases](https://github.com/Tzargath/azo-osm/releases)** (najnowszy: `v1.6.2`) i wskaż go
+w `Wtyczki → Zarządzaj wtyczkami → Zainstaluj z ZIP`. Ta droga **nie dostaje powiadomień
+o aktualizacjach** — trzeba pilnować samemu.
+
+**Albo zbuduj paczkę z kodu:** `./build_plugin_zip.sh` → `azo_izochrony-<wersja>.zip`.
+Gotowe ZIP-y **nie są trzymane w repozytorium** (`.gitignore`), bo paczka wypakowana z kodu
+i paczka sprzed kilku commitów wyglądają identycznie, a nie są tym samym.
+
 **Użycie:** `Processing → AZO — zabezpieczenie operacyjne → Izochrony dojazdu (AZO)`
 (sieć dróg z polem prędkości + punkty jednostek → poligony stref 8/15 min). Szczegóły:
 [`qgis_plugin/azo_izochrony/README.md`](qgis_plugin/azo_izochrony/README.md).
