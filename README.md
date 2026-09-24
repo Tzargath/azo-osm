@@ -44,6 +44,11 @@ Sfinalizowane ryciny z opracowania metodycznego (próg dotarcia **15 min**; jedn
 | metodyczny — bufor malejący + bariery + ostatni odcinek | **48,3 %** |
 | różnica (zawyżenie metody naiwnej) | **9,7 p.p.** ≈ widmo **1 288 km²** |
 
+> **Podstawa metodyczna.** Metodyka stojąca za tymi liczbami — „Jednolita metodyka wyznaczania
+> izochron dojazdu" — została **przyjęta do druku po recenzji w Zeszytach Naukowych SGSP**
+> (2026). Praca druga, o empirycznej kalibracji prędkości operacyjnych na danych SWD PSP,
+> jest w recenzji w tym samym czasopiśmie. Odnośniki pojawią się tutaj po publikacji numerów.
+
 **Wniosek:** uproszczony bufor stały **zawyża** pokrycie 15-minutowe o ~9,7 p.p. względem metodyki, która
 uwzględnia malejący zasięg dojścia, bariery (rzeki, tory) i realne dojście poza drogą. Zawyżenie („widmo",
 1 288 km²) rozkłada się wzdłuż sieci dróg — tam, gdzie naiwny bufor 250 m dorysowuje zasięg, którego model
