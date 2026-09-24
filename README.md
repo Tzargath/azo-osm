@@ -44,10 +44,22 @@ Sfinalizowane ryciny z opracowania metodycznego (próg dotarcia **15 min**; jedn
 | metodyczny — bufor malejący + bariery + ostatni odcinek | **48,3 %** |
 | różnica (zawyżenie metody naiwnej) | **9,7 p.p.** ≈ widmo **1 288 km²** |
 
-> **Podstawa metodyczna.** Metodyka stojąca za tymi liczbami — „Jednolita metodyka wyznaczania
-> izochron dojazdu" — została **przyjęta do druku po recenzji w Zeszytach Naukowych SGSP**
-> (2026). Praca druga, o empirycznej kalibracji prędkości operacyjnych na danych SWD PSP,
-> jest w recenzji w tym samym czasopiśmie. Odnośniki pojawią się tutaj po publikacji numerów.
+> **Podstawa metodyczna — artykuł recenzowany.** Metodyka stojąca za tymi liczbami jest
+> opublikowana:
+>
+> Zuchlke, T. (2026). *A Unified Travel-Time Isochrone Methodology for Operational Coverage
+> Analysis: An Open-Data Demonstration for the Silesian Province.* **Zeszyty Naukowe SGSP,
+> 99(1), 61–75.** [doi:10.5604/01.3001.0055.9211](https://doi.org/10.5604/01.3001.0055.9211)
+>
+> Artykuł pokazuje, że przy **identycznych parametrach ruchu** sama konstrukcja powierzchni
+> zasięgu zmienia wskaźnik pokrycia o **9,7 p.p.** przy progu 15 min (1 288 km² zaliczonych
+> błędnie), a pominięcie czasu alarmowania i użycie prędkości administracyjnych dokładają
+> się do tego osobno. Rozporządzenie KSRG obowiązujące od 1 lipca 2026 potwierdza jeden próg
+> 15 minut, ale **nie określa, jak wyznaczać odpowiadające mu izochrony** — stąd wniosek
+> o zakotwiczenie jednolitej metodyki w przepisie albo w wytycznych KG PSP.
+>
+> Praca druga, o empirycznej kalibracji prędkości operacyjnych na danych SWD PSP, jest
+> w recenzji w tym samym czasopiśmie.
 
 **Wniosek:** uproszczony bufor stały **zawyża** pokrycie 15-minutowe o ~9,7 p.p. względem metodyki, która
 uwzględnia malejący zasięg dojścia, bariery (rzeki, tory) i realne dojście poza drogą. Zawyżenie („widmo",
