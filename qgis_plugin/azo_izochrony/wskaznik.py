@@ -4,8 +4,14 @@ Algorytm Processing: Wskaźnik pokrycia ludności (punkty popytu).
 
 LICZBA do AZO (nie mapa): % ludności w zasięgu T, liczony na PUNKTACH POPYTU, nie z przecięcia
 powierzchni. Dla każdego punktu popytu:
-    czas = min po osiągniętych węzłach drogi p w promieniu R_max [ t_drogi(p) + dist(p,punkt)/v_off ]
+    czas = min po osiągniętych węzłach drogi p w promieniu R_max [ t_drogi(p) + t_dojścia(p,punkt) ]
     pokryty, jeśli czas <= T  (i odcinek dojścia nie przecina bariery)
+
+t_dojścia bez NMT = dist / v_off (jak w artykule). Z NMT (opcja, v1.7): odcinek droga→punkt próbkowany
+co ~10 m, a prędkość każdego kawałka skalowana funkcją Toblera (1993) względem terenu płaskiego:
+    v(S) = v_off · exp(−3,5·|S + 0,05|) / exp(−3,5·0,05),   S = Δh/Δx (dodatni = pod górę)
+Na płaskim v = v_off (3 km/h) — wynik bez NMT i z płaskim NMT jest identyczny. Pod górę 20%: ~0,5·v_off.
+Poza zasięgiem NMT (np. za granicą państwa) kawałek liczony jak płaski.
 Wynik = Σ ludności pokrytych / Σ ludności. Czasy dojazdu liczone superwęzłem (1 Dijkstra, alarmowanie
 wbudowane w koszt krawędzi superwęzeł->jednostka). Dokładniejsze i tańsze niż przecięcie z powierzchnią,
 odporne na bariery. W pełni offline.
@@ -16,7 +22,7 @@ from qgis.core import (
     QgsProcessingParameterVectorLayer, QgsProcessingParameterFeatureSource,
     QgsProcessingParameterField, QgsProcessingParameterNumber, QgsProcessingParameterString,
     QgsProcessingParameterMatrix, QgsProcessingParameterFeatureSink,
-    QgsProcessingParameterDefinition, QgsProcessingOutputNumber,
+    QgsProcessingParameterDefinition, QgsProcessingOutputNumber, QgsProcessingParameterRasterLayer,
     QgsFields, QgsField, QgsFeature, QgsGeometry, QgsPointXY, QgsWkbTypes,
     QgsVectorLayer, QgsCoordinateTransform, QgsProject, QgsFeatureRequest,
     QgsSpatialIndex, QgsRectangle, QgsProcessingUtils,
@@ -26,6 +32,8 @@ from qgis.analysis import (
     QgsVectorLayerDirector, QgsNetworkSpeedStrategy, QgsGraphBuilder, QgsGraphAnalyzer,
 )
 from .algorithm import DEF_SPEEDS, DEF_ALARM
+from .params import DEFAULT_OFFROAD_KMH
+import math
 
 
 class WskaznikPokryciaAlgorithm(QgsProcessingAlgorithm):
@@ -42,6 +50,7 @@ class WskaznikPokryciaAlgorithm(QgsProcessingAlgorithm):
     THRESHOLDS = 'THRESHOLDS'
     OFFROAD_SPEED = 'OFFROAD_SPEED'
     OFFROAD_MAX = 'OFFROAD_MAX'
+    DEM = 'DEM'
     BARRIERS = 'BARRIERS'
     TOLERANCE = 'TOLERANCE'
     OUTPUT = 'OUTPUT'
@@ -115,10 +124,12 @@ class WskaznikPokryciaAlgorithm(QgsProcessingAlgorithm):
             self.THRESHOLDS, self.tr('Progi czasu dotarcia [min]'), defaultValue='8,15'))
         self.addParameter(QgsProcessingParameterNumber(
             self.OFFROAD_SPEED, self.tr('Prędkość dojścia/ostatniego odcinka [km/h]'),
-            QgsProcessingParameterNumber.Double, defaultValue=10.0, minValue=1))
+            QgsProcessingParameterNumber.Double, defaultValue=DEFAULT_OFFROAD_KMH, minValue=1))
         self.addParameter(QgsProcessingParameterNumber(
             self.OFFROAD_MAX, self.tr('Maks. dojście poza drogą R_max [m]'),
             QgsProcessingParameterNumber.Double, defaultValue=300.0, minValue=0))
+        self.addParameter(QgsProcessingParameterRasterLayer(
+            self.DEM, self.tr('NMT — dojście zależne od nachylenia (Tobler), opcjonalnie'), optional=True))
         self.addParameter(QgsProcessingParameterFeatureSource(
             self.BARRIERS, self.tr('Bariery (rzeki, tory, tereny zamknięte) — opcjonalne'),
             [QgsProcessing.TypeVectorPolygon, QgsProcessing.TypeVectorLine], optional=True))
@@ -158,6 +169,10 @@ class WskaznikPokryciaAlgorithm(QgsProcessingAlgorithm):
         off_ms = self.parameterAsDouble(parameters, self.OFFROAD_SPEED, context) / 3.6
         rmax = self.parameterAsDouble(parameters, self.OFFROAD_MAX, context)
         tol = self.parameterAsDouble(parameters, self.TOLERANCE, context)
+        dem = self.parameterAsRasterLayer(parameters, self.DEM, context)
+        teren = _Teren(dem, crs, context) if dem is not None else None
+        if teren is not None:
+            feedback.pushInfo(self.tr('NMT: %s — dojście liczone funkcją Toblera') % dem.name())
 
         try:
             thresholds = sorted({float(x) for x in thr_str.replace(';', ',').split(',') if x.strip()})
@@ -309,7 +324,13 @@ class WskaznikPokryciaAlgorithm(QgsProcessingAlgorithm):
                 d = ((p.x() - rp.x()) ** 2 + (p.y() - rp.y()) ** 2) ** 0.5
                 if d > rmax:
                     continue
-                arr = node_t[cid] + d / off_ms
+                if teren is None:
+                    arr = node_t[cid] + d / off_ms
+                else:
+                    # tanie odcięcie: żaden spadek nie przyspiesza dojścia o więcej niż 1/_NORM (~1,19×)
+                    if best is not None and node_t[cid] + d / (off_ms / _Teren._NORM) >= best:
+                        continue
+                    arr = node_t[cid] + teren.czas(rp, p, d, off_ms)
                 if best is not None and arr >= best:
                     continue
                 if blocked(p, QgsPointXY(rp)):
@@ -359,3 +380,63 @@ class WskaznikPokryciaAlgorithm(QgsProcessingAlgorithm):
         except Exception:
             pass
         return {self.OUTPUT: self._dest_id}
+
+
+class _Teren:
+    """NMT wczytany RAZ do pamięci (siatka), żeby próbkowanie było tanie.
+
+    ⚠ Zapytanie do dostawcy rastra o każdą próbkę przy ~50 tys. punktów popytu × kilkadziesiąt
+    węzłów × kilkadziesiąt próbek trwałoby godzinami. Wartość pusta / poza zakresem → None
+    (kawałek liczony jak płaski — brak danych nie może udawać stromizny).
+    """
+    KROK = 10.0      # [m] gęstość próbkowania odcinka dojścia
+    _NORM = math.exp(-3.5 * 0.05)
+
+    def __init__(self, dem, crs, context):
+        from qgis.core import QgsCoordinateTransform, QgsProject
+        if dem.crs() != crs:
+            raise QgsProcessingException('NMT musi być w tym samym układzie co sieć (%s).' % crs.authid())
+        prov = dem.dataProvider()
+        ext = dem.extent()
+        self.nx, self.ny = dem.width(), dem.height()
+        self.x0, self.y1 = ext.xMinimum(), ext.yMaximum()
+        self.dx = ext.width() / self.nx
+        self.dy = ext.height() / self.ny
+        import numpy as np          # dostarczany z każdą instalacją QGIS
+        blk = prov.block(1, ext, self.nx, self.ny)
+        z = np.array(blk.as_numpy(), dtype='float64') if hasattr(blk, 'as_numpy') else \
+            np.array([[blk.value(r, c) for c in range(self.nx)] for r in range(self.ny)], dtype='float64')
+        if hasattr(z, 'mask'):
+            z = np.ma.filled(z, np.nan)
+        if prov.sourceHasNoDataValue(1):
+            z[z == prov.sourceNoDataValue(1)] = np.nan
+        self.z = z
+
+    def h(self, x, y):
+        c = int((x - self.x0) / self.dx); r = int((self.y1 - y) / self.dy)
+        if 0 <= r < self.ny and 0 <= c < self.nx:
+            v = self.z[r, c]
+            if v == v:                     # NaN ≠ NaN — pusty piksel
+                return float(v)
+        return None
+
+    def czas(self, a, b, d, v_ms):
+        """Czas dojścia z punktu drogi `a` do punktu `b` (odległość pozioma `d`) [s]."""
+        if d <= 0:
+            return 0.0
+        n = max(1, int(math.ceil(d / self.KROK)))
+        t = 0.0
+        hp = self.h(a.x(), a.y())
+        for i in range(1, n + 1):
+            f = i / n
+            x = a.x() + (b.x() - a.x()) * f; y = a.y() + (b.y() - a.y()) * f
+            hk = self.h(x, y)
+            seg = d / n
+            if hp is None or hk is None:
+                v = v_ms
+            else:
+                S = (hk - hp) / seg
+                v = v_ms * math.exp(-3.5 * abs(S + 0.05)) / self._NORM
+            t += seg / v
+            hp = hk
+        return t
