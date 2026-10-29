@@ -343,11 +343,17 @@ class DaneGugikAlgorithm(QgsProcessingAlgorithm):
         gdal.BuildVRT(vrt, kafelki)
         gdal.Translate(wynik, vrt, creationOptions=['COMPRESS=DEFLATE', 'TILED=YES'],
                        noData=0)            # ⛔ poza Polską usługa zwraca 0, nie brak danych
+        # ⛔⛔ KASUJEMY TEŻ SIDECARY `.aux.xml`. To one zatruwają walidację: GDAL
+        #   zapisuje w nich policzone statystyki i przy kolejnym otwarciu czyta je
+        #   ZAMIAST liczyć, więc jeden pusty kafel skazuje nazwę pliku na zawsze.
+        #   Zostawienie ich w katalogu użytkownika to śmieci, które przy następnym
+        #   pobraniu zrobią z poprawnego kafla „raster bez danych".
         for p in kafelki + [vrt]:
-            try:
-                os.remove(p)
-            except OSError:
-                pass
+            for q in (p, p + ".aux.xml"):
+                try:
+                    os.remove(q)
+                except OSError:
+                    pass
         feedback.pushInfo(self.tr('NMT zapisany: ') + wynik)
         return wynik
 
@@ -364,11 +370,16 @@ class DaneGugikAlgorithm(QgsProcessingAlgorithm):
             if feedback.isCanceled():
                 return False
             try:
-                tresc = self._pobierz(url, limit=90)
+                tresc = self._zdejmij_koperte(self._pobierz(url, limit=90))
                 with open(cel, 'wb') as f:
                     f.write(tresc)
                 if self._ma_dane(cel):
                     return True
+                # ⚠ Odrzucenie przez walidację też jest POWODEM — bez tego log milczy
+                #   i wygląda, jakby usługa po prostu nie odpowiadała.
+                feedback.pushDebugInfo(
+                    f'{os.path.basename(cel)} próba {proba}: raster bez danych '
+                    f'({os.path.getsize(cel) if os.path.exists(cel) else 0} B)')
             except Exception as e:  # noqa: BLE001 — 404/timeout traktujemy jak „zwolnij"
                 feedback.pushDebugInfo(f'{os.path.basename(cel)} próba {proba}: {e}')
             import time
@@ -378,6 +389,29 @@ class DaneGugikAlgorithm(QgsProcessingAlgorithm):
         except OSError:
             pass
         return False
+
+    @staticmethod
+    def _zdejmij_koperte(surowe: bytes) -> bytes:
+        """Zdejmuje kopertę `multipart/related` z odpowiedzi WCS.
+
+        ⛔⛔ TO NIE JEST DETAL — bez tego NIC nie działa. Geoportal oddaje raster
+        owinięty w MIME (`Content-Type: multipart/related; boundary=wcs`), a zapisany
+        w całości plik ma na początku nagłówki, których GDAL nie przeczyta.
+        Objaw jest MYLĄCY: pobranie kończy się HTTP 200, plik ma kilka MB, a walidacja
+        mówi „raster jednolity" i poprawnie go odrzuca — więc wygląda to na kapryszącą
+        usługę, a nie na brakujące pięć linijek. Zmierzone 29.10.2026: jeden kafel,
+        6 prób, 125 s, wszystkie odrzucone z tego powodu.
+        Bez koperty (gdyby kiedyś przestali jej używać) — zwraca bez zmian.
+        """
+        if b"--wcs" not in surowe:
+            return surowe
+        gr = b"\r\n--wcs" if b"\r\n--wcs" in surowe else b"\n--wcs"
+        for czesc in surowe.split(gr):
+            if b"aaigrid" in czesc.lower() or b"image/tiff" in czesc.lower():
+                sep = b"\r\n\r\n" if b"\r\n\r\n" in czesc else b"\n\n"
+                if sep in czesc:
+                    return czesc.split(sep, 1)[1].rstrip(b"-\r\n")
+        return surowe
 
     @staticmethod
     def _ma_dane(plik):
