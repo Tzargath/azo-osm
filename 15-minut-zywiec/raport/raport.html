@@ -163,8 +163,12 @@ gminna 30, gruntowa 15 km/h. Wersja 1.7 dodaje opcjonalny model dojścia zależn
 
 <h3>Czego ta praca nie rozstrzyga</h3>
 <ul>
-  <li>Model liczy <b>czas dojazdu</b>, nie czas interwencji — nie obejmuje dysponowania,
-      zbiórki ratowników OSP ani warunków drogowych w danej chwili.</li>
+  <li>Model liczy czas od zgłoszenia i <b>obejmuje czas alarmowania</b>: 3 minuty dla JRG
+      i 10 minut dla OSP (wartości KG PSP). ⚠ Są to jednak <b>założenia ryczałtowe</b>,
+      jednakowe dla wszystkich jednostek — realna zbiórka ratowników OSP bywa i krótsza,
+      i znacznie dłuższa. To ta liczba, nie sieć dróg, jest tu największym uproszczeniem.</li>
+  <li>Model <b>nie obejmuje</b> czasu dysponowania przez stanowisko kierowania ani warunków
+      drogowych w danej chwili (pogoda, ruch, roboty).</li>
   <li>Prędkości są <b>planistyczne</b>, przypisane kategorii drogi, a nie zmierzone w ruchu.</li>
   <li>Ludność jest rozłożona na budynki mieszkalne proporcjonalnie, w granicach miejscowości —
       to przybliżenie, nie spis.</li>
