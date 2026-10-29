@@ -133,6 +133,23 @@ class DaneGugikAlgorithm(QgsProcessingAlgorithm):
             self.NMT_KAT, self.tr('Katalog na NMT (gdy pobierany)'), optional=True))
 
     # ── pomocnicze ───────────────────────────────────────────────────────────
+    # ⛔⛔ WTYCZKA ŁĄCZY SIĘ WYŁĄCZNIE Z TYMI HOSTAMI. Nic innego nie ma prawa przejść.
+    #   Bandit (B310) słusznie zgłasza `urlopen` bez sprawdzenia schematu: dopuszcza
+    #   `file://` i schematy własne, więc adres zbudowany z czyjegoś wejścia mógłby
+    #   przeczytać plik z dysku użytkownika. Dziś adresy powstają ze stałych i cyfr
+    #   TERYT, ale to własność OBECNEGO kodu, a nie gwarancja — więc ograniczenie
+    #   stoi w jednym miejscu i obowiązuje każde żądanie.
+    DOZWOLONE_HOSTY = frozenset({"opendata.geoportal.gov.pl", "mapy.geoportal.gov.pl"})
+
+    @classmethod
+    def _sprawdz_url(cls, url: str) -> str:
+        czesci = urllib.parse.urlparse(url)
+        if czesci.scheme != "https" or czesci.hostname not in cls.DOZWOLONE_HOSTY:
+            raise QgsProcessingException(
+                f"Odmawiam połączenia: dozwolone jest wyłącznie https do "
+                f"{', '.join(sorted(cls.DOZWOLONE_HOSTY))} (było: {czesci.scheme}://{czesci.hostname})")
+        return url
+
     @staticmethod
     def _kontekst_ssl():
         """Zestaw certyfikatów do HTTPS.
@@ -159,8 +176,10 @@ class DaneGugikAlgorithm(QgsProcessingAlgorithm):
         do pamięci działa, ale nie daje ani postępu, ani szansy na anulowanie —
         a użytkownik przy wolnym łączu nie wie wtedy, czy wtyczka pracuje, czy zawisła.
         """
-        req = urllib.request.Request(url, headers={'User-Agent': 'QGIS-AZO/1.8'})
-        with urllib.request.urlopen(req, timeout=LIMIT_S, context=self._kontekst_ssl()) as r:
+        req = urllib.request.Request(self._sprawdz_url(url),
+                                     headers={'User-Agent': 'QGIS-AZO/1.8'})
+        with urllib.request.urlopen(  # nosec B310 — schemat i host sprawdzone w `_sprawdz_url`
+                req, timeout=LIMIT_S, context=self._kontekst_ssl()) as r:
             calosc = int(r.headers.get('Content-Length') or 0)
             pobrane = 0
             with open(cel, 'wb') as f:
@@ -179,9 +198,10 @@ class DaneGugikAlgorithm(QgsProcessingAlgorithm):
     @staticmethod
     def _pobierz(url, limit=90):
         """Małe żądanie (kafel NMT) — w całości do pamięci."""
-        req = urllib.request.Request(url, headers={'User-Agent': 'QGIS-AZO/1.8'})
+        req = urllib.request.Request(DaneGugikAlgorithm._sprawdz_url(url),
+                                     headers={'User-Agent': 'QGIS-AZO/1.8'})
         try:
-            with urllib.request.urlopen(
+            with urllib.request.urlopen(  # nosec B310 — schemat i host sprawdzone wyżej
                     req, timeout=limit,
                     context=DaneGugikAlgorithm._kontekst_ssl()) as r:
                 return r.read()
