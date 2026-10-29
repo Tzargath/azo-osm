@@ -5,11 +5,15 @@ from qgis.core import QgsProcessingProvider
 from .algorithm import IzochronyAZOAlgorithm
 from .wskaznik import WskaznikPokryciaAlgorithm
 from .jednostki import PokrycieJednostkiAlgorithm
+from .dane_gugik import DaneGugikAlgorithm
 
 
 class AzoProvider(QgsProcessingProvider):
 
     def loadAlgorithms(self):
+        # ⚠ Pobieranie danych PIERWSZE na liście — to jest pierwszy krok
+        #   użytkownika, który ma własny powiat i nic poza numerem TERYT.
+        self.addAlgorithm(DaneGugikAlgorithm())
         self.addAlgorithm(IzochronyAZOAlgorithm())
         self.addAlgorithm(WskaznikPokryciaAlgorithm())
         self.addAlgorithm(PokrycieJednostkiAlgorithm())

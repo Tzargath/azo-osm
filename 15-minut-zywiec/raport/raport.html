@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8">
+<title>15 minut — powiat żywiecki</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm 14mm; }
+  :root { --t:#11161d; --s:#4a5668; --l:#6b7a8d; --a:#1c6fb8; --r:#b36b00; --line:#d8dee6; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:10.5pt/1.5 "Helvetica Neue",Helvetica,Arial,sans-serif; color:#11161d; }
+  h1 { font-size:19pt; line-height:1.2; margin:0 0 2mm; letter-spacing:-.2pt; }
+  .lead { font-size:11pt; color:#3c4857; margin:0 0 5mm; }
+  h2,h3 { page-break-after: avoid; }
+  h2 { font-size:12pt; margin:7mm 0 2mm; padding-bottom:1mm; border-bottom:1.2px solid #11161d; }
+  h3 { font-size:10.5pt; margin:4mm 0 1.5mm; }
+  p  { margin:0 0 2.5mm; }
+  .meta { font-size:8.5pt; color:#6b7a8d; margin:0 0 6mm; }
+  table { page-break-inside: auto; width:100%; border-collapse:collapse; font-size:9.5pt; margin:2mm 0 3mm; }
+  th,td { padding:1.6mm 2mm; border-bottom:1px solid #d8dee6; text-align:right; }
+  th:first-child, td:first-child { text-align:left; }
+  thead th { border-bottom:1.2px solid #11161d; font-size:8.5pt; text-transform:uppercase;
+             letter-spacing:.04em; color:#4a5668; }
+  tr.key td { font-weight:700; background:#eef5fb; }
+  tr.key td:first-child { box-shadow:inset 3px 0 0 #1c6fb8; }
+  .num { font-variant-numeric: tabular-nums; }
+  figure { margin:3mm 0 4mm; page-break-inside:avoid; }
+  figure img { width:100%; border:1px solid #d8dee6; }
+  figcaption { font-size:8.5pt; color:#6b7a8d; margin-top:1.5mm; }
+  .box { border-left:3px solid #1c6fb8; background:#f5f9fd; padding:2.5mm 3.5mm; margin:3mm 0; }
+  .box.warn { border-left-color:#b36b00; background:#fdf8ef; }
+  .big { font-size:15pt; font-weight:700; color:#1c6fb8; }
+  .stopka { margin-top:7mm; padding-top:2.5mm; border-top:1px solid #d8dee6;
+            font-size:8pt; color:#6b7a8d; }
+  .pb { page-break-before: always; }
+  tr { page-break-inside: avoid; }
+  ul { margin:0 0 2.5mm; padding-left:4.5mm; }
+  li { margin-bottom:1mm; }
+  code { font:9pt ui-monospace,Menlo,monospace; background:#f0f3f7; padding:0 1mm; }
+</style></head>
+<body>
+
+<h1>15 minut</h1>
+<p class="lead">Dostępność ratownicza powiatu żywieckiego policzona na danych i usługach GUGiK —
+z otwartym narzędziem dla każdego powiatu.</p>
+<p class="meta">Tomasz Zuchlke · opracowanie prywatne, nie stanowi stanowiska Państwowej Straży Pożarnej ·
+wyłącznie dane publicznie dostępne</p>
+
+<h2>Pytanie</h2>
+<p>Do ilu mieszkańców powiatu żywieckiego jednostki Krajowego Systemu Ratowniczo-Gaśniczego
+docierają w 15 minut od zgłoszenia? Tę samą analizę wykonałem <b>dwa razy</b> — z tymi samymi
+jednostkami, mieszkańcami i parametrami — raz na sieci dróg z OpenStreetMap, raz na sieci dróg
+z <b>BDOT10k</b>. Różnią się wyłącznie dane o drogach.</p>
+
+<table>
+  <thead><tr><th>sieć dróg</th><th>≤ 8 min</th><th>≤ 15 min</th><th>w zasięgu 15 min</th></tr></thead>
+  <tbody>
+    <tr><td>OpenStreetMap (filtr dróg jak w artykule)</td><td class="num">12,6%</td><td class="num">71,8%</td><td class="num">106 097</td></tr>
+    <tr><td>OpenStreetMap + drogi <code>service</code>/<code>track</code></td><td class="num">13,3%</td><td class="num">74,1%</td><td class="num">109 460</td></tr>
+    <tr><td>OpenStreetMap, <code>tertiary</code> = 50 km/h <i>(test czułości)</i></td><td class="num">17,6%</td><td class="num">82,1%</td><td class="num">121 345</td></tr>
+    <tr><td>BDOT10k — drogi publiczne</td><td class="num">14,1%</td><td class="num">76,6%</td><td class="num">113 149</td></tr>
+    <tr class="key"><td>BDOT10k — wszystkie drogi</td><td class="num">15,2%</td><td class="num">84,1%</td><td class="num">124 256</td></tr>
+    <tr><td>BDOT10k + dojście zależne od nachylenia (NMT, Tobler)</td><td class="num">14,9%</td><td class="num">83,3%</td><td class="num">123 108</td></tr>
+  </tbody>
+</table>
+<p class="meta">Ludność w modelu: 147 802 osoby w 52 278 budynkach mieszkalnych. Jednostki: JRG Żywiec
+i 33 OSP włączone do KSRG (wykaz KG PSP, maj 2026).</p>
+
+<div class="box">
+  <p style="margin:0"><span class="big">15 090 osób</span> w 6 168 budynkach mieszkalnych jest
+  w zasięgu 15 minut według BDOT10k, a poza nim według OpenStreetMap. To więcej, niż liczy cała
+  gmina Węgierska Górka (15 044).</p>
+</div>
+
+<h2>Skąd bierze się ta różnica</h2>
+<p>Najpierw sprawdziłem najprostsze wytłumaczenie — że BDOT10k po prostu ma więcej dróg.
+<b>Nie ma.</b> Po dołożeniu do OpenStreetMap dróg leśnych i dojazdowych (<code>service</code>,
+<code>track</code>) sieć OSM liczy w tym powiecie <b>więcej</b> kilometrów niż BDOT10k
+(2 386 km samych <code>track</code> wobec 1 802 km dróg gruntowych w BDOT10k) — a wynik rośnie
+tylko o 2,3 p.p., do 74,1%.</p>
+
+<p>Decyduje <b>kategoria zarządzania drogi</b>. W OpenStreetMap analityk musi założyć, czym jest
+<code>tertiary</code>: drogą powiatową czy gminną. Od tego jednego założenia ten sam powiat ma
+<b>74,1% albo 82,1%</b> — osiem punktów procentowych różnicy, bez zmiany choćby jednego metra sieci.
+Przy założeniu wyższej prędkości OSM zaczyna przy tym <b>zawyżać</b> zasięg ośmiominutowy
+(17,6% wobec 15,2%), bo <code>tertiary</code> miesza drogi powiatowe z gminnymi.</p>
+
+<p>BDOT10k niesie kategorię zarządzania i nawierzchnię <b>każdej</b> drogi jako atrybut urzędowy,
+jednolity w całym kraju. Nie trzeba niczego zakładać — i dlatego odpowiedź jest jedna: 84,1%.</p>
+
+<div class="box warn">
+  <p style="margin:0"><b>To jest cała teza tej pracy:</b> BDOT10k zamienia <i>założenie analityka</i>
+  na <i>atrybut urzędowy</i>. Dzięki temu ta sama metoda da porównywalny wynik w każdym z 380 powiatów
+  i w kolejnych latach — czego na danych zależnych od założeń zapewnić się nie da.</p>
+</div>
+
+<h2>Gdzie ta różnica leży</h2>
+<figure>
+  <img src="../mapy/wykres_gmin.png" alt="Porównanie gmin">
+  <figcaption>Odsetek mieszkańców w zasięgu 15 minut, gmina po gminie: OpenStreetMap wobec BDOT10k.</figcaption>
+</figure>
+
+<table>
+  <thead><tr><th>gmina</th><th>ludność</th><th>OSM</th><th>BDOT10k</th><th>różnica</th></tr></thead>
+  <tbody>
+    <tr><td>Koszarawa</td><td class="num">2 344</td><td class="num">41,3%</td><td class="num">57,9%</td><td class="num">+16,6</td></tr>
+    <tr><td>Rajcza</td><td class="num">8 181</td><td class="num">36,7%</td><td class="num">53,0%</td><td class="num">+16,3</td></tr>
+    <tr><td>Świnna</td><td class="num">6 054</td><td class="num">57,8%</td><td class="num">75,3%</td><td class="num">+17,5</td></tr>
+    <tr><td>Czernichów</td><td class="num">6 364</td><td class="num">61,6%</td><td class="num">79,0%</td><td class="num">+17,4</td></tr>
+    <tr><td>Milówka</td><td class="num">9 797</td><td class="num">64,0%</td><td class="num">79,1%</td><td class="num">+15,1</td></tr>
+    <tr><td>Jeleśnia</td><td class="num">12 630</td><td class="num">49,8%</td><td class="num">64,1%</td><td class="num">+14,3</td></tr>
+    <tr><td>Radziechowy-Wieprz</td><td class="num">11 693</td><td class="num">65,3%</td><td class="num">79,4%</td><td class="num">+14,1</td></tr>
+    <tr><td>Lipowa</td><td class="num">10 553</td><td class="num">80,8%</td><td class="num">94,4%</td><td class="num">+13,6</td></tr>
+    <tr><td>Łodygowice</td><td class="num">13 725</td><td class="num">78,0%</td><td class="num">90,7%</td><td class="num">+12,7</td></tr>
+    <tr><td>Węgierska Górka</td><td class="num">15 044</td><td class="num">79,7%</td><td class="num">90,4%</td><td class="num">+10,7</td></tr>
+    <tr><td>Ślemień</td><td class="num">3 626</td><td class="num">79,6%</td><td class="num">90,0%</td><td class="num">+10,4</td></tr>
+    <tr><td>Ujsoły</td><td class="num">4 614</td><td class="num">49,7%</td><td class="num">58,6%</td><td class="num">+8,9</td></tr>
+    <tr><td>Gilowice</td><td class="num">6 010</td><td class="num">82,5%</td><td class="num">88,0%</td><td class="num">+5,5</td></tr>
+    <tr><td>Łękawica</td><td class="num">3 303</td><td class="num">81,1%</td><td class="num">84,4%</td><td class="num">+3,3</td></tr>
+    <tr class="key"><td>Żywiec <i>(miasto)</i></td><td class="num">33 866</td><td class="num">99,9%</td><td class="num">99,8%</td><td class="num">−0,1</td></tr>
+  </tbody>
+</table>
+
+<div class="box">
+  <p style="margin:0"><b>W mieście różnica znika — i to jest najważniejsza obserwacja tej tabeli.</b>
+  W Żywcu OpenStreetMap daje wynik o 0,1 p.p. <i>wyższy</i> niż BDOT10k. Tam, gdzie mapa społecznościowa
+  jest gęsta i dobrze utrzymana, dane urzędowe nie wnoszą nic. Cała przewaga BDOT10k powstaje
+  w gminach górskich, przy zabudowie rozproszonej — czyli dokładnie tam, gdzie pomoc i tak jedzie
+  najdłużej, a błąd w ocenie zasięgu kosztuje najwięcej.</p>
+</div>
+
+<h3>Teren</h3>
+<p>Sprawdziłem też, czy wynik nie jest zniekształcony przez pominięcie ukształtowania terenu.
+Dojście piesze od drogi do budynku, zależne od nachylenia (NMT 10 m z usługi WCS, funkcja Toblera),
+zmienia wynik o <b>−0,8 p.p.</b> — mniej, niż spodziewałbym się w Beskidach. Powód jest prosty:
+dojście poza drogą jest krótkie (do 300 m), więc nachylenie nie zdąży wpłynąć na czas.
+<b>W powiecie górskim o zasięgu ratownictwa decyduje sieć dróg (+12,3 p.p.), a nie stok (−0,8 p.p.).</b></p>
+
+<h2>Metoda</h2>
+<p>Wtyczka QGIS <b>Izochrony AZO</b>, algorytm „Wskaźnik pokrycia ludności”: graf drogowy,
+jedno przejście Dijkstry z superźródła obejmującego wszystkie jednostki, czas alarmowania
+JRG 3 min i OSP 10 min, dojście poza drogą 3 km/h do 300 m, bariery liniowe (rzeki, wody, tory
+z BDOT10k), prędkości planistyczne wg kategorii drogi: krajowa 60, wojewódzka 60, powiatowa 50,
+gminna 30, gruntowa 15 km/h. Wersja 1.7 dodaje opcjonalny model dojścia zależny od nachylenia.</p>
+<p>Podstawa metodyczna: Zuchlke T., <i>Zeszyty Naukowe SGSP</i>, doi:10.5604/01.3001.0055.9211.</p>
+
+<h3>Wykorzystane dane i usługi GUGiK</h3>
+<ul>
+  <li><b>BDOT10k</b> (powiat 2417): sieć dróg <code>SKJZ</code> z kategorią zarządzania
+      i nawierzchnią, budynki <code>BUBD</code>, adresy i miejscowości <code>ADMS_P</code>,
+      granice gmin <code>ADJA</code>, cieki i wody <code>SWRS</code>/<code>PTWP</code>,
+      tory <code>SKTR</code>, budynki straży pożarnych,</li>
+  <li><b>NMT</b> 10 m — usługa <b>WCS</b> (model dojścia pieszego),</li>
+  <li><b>ortofotomapa</b> — usługa <b>WMS</b> (mapa i wizualizacja 3D),</li>
+  <li><b>PRG</b> — granice administracyjne.</li>
+</ul>
+
+<h3>Co jest ogólnodostępne</h3>
+<ul>
+  <li>mapa A3, ten raport i wizualizacja 3D „15 minut”,</li>
+  <li>bezpłatna wtyczka QGIS <b>Izochrony AZO</b> — każdy może powtórzyć tę analizę dla dowolnego
+      powiatu, bez licencji i bez danych komercyjnych,</li>
+  <li>skrypty odtwarzające wszystkie liczby z tego raportu od zera: pobranie danych,
+      przygotowanie warstw, policzenie wariantów i zestawienie porównawcze.</li>
+</ul>
+
+<h3>Czego ta praca nie rozstrzyga</h3>
+<ul>
+  <li>Model liczy <b>czas dojazdu</b>, nie czas interwencji — nie obejmuje dysponowania,
+      zbiórki ratowników OSP ani warunków drogowych w danej chwili.</li>
+  <li>Prędkości są <b>planistyczne</b>, przypisane kategorii drogi, a nie zmierzone w ruchu.</li>
+  <li>Ludność jest rozłożona na budynki mieszkalne proporcjonalnie, w granicach miejscowości —
+      to przybliżenie, nie spis.</li>
+  <li>Wynik dla OpenStreetMap zależy od dnia pobrania danych; BDOT10k ma datę wydania.</li>
+</ul>
+
+<div class="stopka">
+  Opracowanie prywatne. Nie stanowi stanowiska Państwowej Straży Pożarnej.
+  Wykorzystano wyłącznie dane i usługi publicznie dostępne.
+</div>
+
+</body></html>
