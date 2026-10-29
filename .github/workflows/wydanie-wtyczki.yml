@@ -1,0 +1,76 @@
+# Wydanie wtyczki „Izochrony AZO" — na push taga `v<wersja>`, np. `v1.8.0`.
+#
+# ⚠⚠ DLACZEGO NIE `qgis-plugin-ci`. Narzędzie jest dobre, ale przy wtyczce leżącej
+# w PODKATALOGU repozytorium przemianowuje katalog w paczce na slug z pola `name`
+# (u nas: `izochrony_azo_psp`). QGIS rozpoznaje wtyczkę po NAZWIE KATALOGU, więc dla
+# dotychczasowych użytkowników nie byłaby to aktualizacja, tylko DRUGA wtyczka obok.
+# Zmierzone 29.10.2026 na `qgis-plugin-ci 2.11.0`.
+# ⇒ pakujemy własnym `build_plugin_zip.sh` (ten sam, którego używamy lokalnie — JEDNA
+#   ścieżka pakowania), a wysyłamy tokenowym API plugins.qgis.org.
+
+name: Wydanie wtyczki
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  wydanie:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Wersja w metadata.txt musi zgadzać się z tagiem
+        run: |
+          # ⛔ BRAMKA. Rozjazd wersji to klasyk: tag v1.8.0, a w metadata 1.7.0 —
+          #    repozytorium QGIS przyjęłoby paczkę i użytkownicy dostaliby złą wersję.
+          TAG="${GITHUB_REF_NAME#v}"
+          META=$(grep -E '^version=' qgis_plugin/azo_izochrony/metadata.txt | cut -d= -f2 | tr -d '[:space:]')
+          echo "tag=$TAG  metadata=$META"
+          if [ "$TAG" != "$META" ]; then
+            echo "::error::Tag $TAG != wersja w metadata.txt ($META)"; exit 1
+          fi
+
+      - name: Spakuj wtyczkę
+        run: |
+          bash build_plugin_zip.sh
+          ls -la azo_izochrony-*.zip
+
+      - name: Sprawdź strukturę paczki
+        run: |
+          # ⛔ Katalog w ZIP-ie MUSI nazywać się `azo_izochrony` — po tym QGIS poznaje,
+          #    że to aktualizacja istniejącej wtyczki, a nie nowa.
+          Z=$(ls azo_izochrony-*.zip | head -1)
+          KAT=$(unzip -Z1 "$Z" | head -1 | cut -d/ -f1)
+          echo "katalog w paczce: $KAT"
+          [ "$KAT" = "azo_izochrony" ] || { echo "::error::zły katalog w ZIP: $KAT"; exit 1; }
+          unzip -Z1 "$Z" | grep -q "azo_izochrony/metadata.txt" || { echo "::error::brak metadata.txt"; exit 1; }
+          unzip -Z1 "$Z" | grep -q "__pycache__" && { echo "::error::cache w paczce"; exit 1; } || true
+
+      - name: Release na GitHubie
+        uses: softprops/action-gh-release@v2
+        with:
+          files: azo_izochrony-*.zip
+          generate_release_notes: true
+
+      - name: Wyślij na plugins.qgis.org
+        env:
+          TOKEN: ${{ secrets.OSGEO_PLUGIN_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            # ⚠ GŁOŚNO, nie po cichu: brak sekretu znaczy, że użytkownicy wtyczki
+            #   NIE DOSTANĄ tej wersji, choć Release na GitHubie powstał.
+            echo "::warning::Brak sekretu OSGEO_PLUGIN_TOKEN — pomijam wysyłkę do repozytorium QGIS."
+            exit 0
+          fi
+          Z=$(ls azo_izochrony-*.zip | head -1)
+          KOD=$(curl -sS -o /tmp/odp.json -w '%{http_code}' \
+            -X POST "https://plugins.qgis.org/plugins/api/azo_izochrony/version/add/" \
+            -H "Authorization: Bearer $TOKEN" \
+            -F "package=@${Z}" -F "auto_approve_after_scan=true")
+          echo "HTTP $KOD"; cat /tmp/odp.json || true
+          case "$KOD" in 2*) echo "✅ wysłane";; *) echo "::error::wysyłka nieudana (HTTP $KOD)"; exit 1;; esac
