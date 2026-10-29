@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="pl"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>15 minut — powiat żywiecki</title>
+<meta name="description" content="Dostępność ratownicza powiatu żywieckiego policzona na danych i usługach GUGiK — BDOT10k wobec OpenStreetMap, z otwartym narzędziem dla każdego powiatu.">
+<style>
+  :root{
+    --tlo:#0b1017; --karta:#121a24; --linia:#1e2a38;
+    --tekst:#e8eef6; --cichy:#8ea2be; --akcent:#37c8ff;
+    --bursztyn:#ffb000; --zielony:#78c878;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--tlo);color:var(--tekst);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .w{max-width:1020px;margin:0 auto;padding:0 20px}
+  header{padding:56px 0 34px;border-bottom:1px solid var(--linia)}
+  h1{font-size:clamp(34px,6vw,58px);line-height:1.02;margin:0 0 10px;letter-spacing:-1.2px}
+  .lead{font-size:clamp(17px,2.4vw,21px);color:#c3d2e6;margin:0 0 6px;max-width:48ch}
+  .kto{color:var(--cichy);font-size:14px;margin-top:18px}
+  h2{font-size:22px;margin:46px 0 12px;letter-spacing:-.3px}
+  h3{font-size:16px;margin:26px 0 8px;color:#c3d2e6}
+  p{margin:0 0 14px;color:#c3d2e6}
+  a{color:var(--akcent)}
+  .liczby{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin:26px 0 8px}
+  .l{background:var(--karta);border:1px solid var(--linia);border-radius:14px;padding:18px}
+  .l .v{font-size:34px;font-weight:700;letter-spacing:-1px;line-height:1.1}
+  .l .o{color:var(--cichy);font-size:13.5px;margin-top:4px}
+  .b{color:var(--bursztyn)} .z{color:var(--zielony)}
+  figure{margin:22px 0}
+  img,video{width:100%;display:block;border-radius:12px;border:1px solid var(--linia);background:#000}
+  figcaption{color:var(--cichy);font-size:13.5px;margin-top:8px}
+  table{width:100%;border-collapse:collapse;font-size:14.5px;margin:12px 0 6px}
+  th,td{padding:8px 10px;border-bottom:1px solid var(--linia);text-align:right}
+  th:first-child,td:first-child{text-align:left}
+  thead th{color:var(--cichy);font-size:12px;text-transform:uppercase;letter-spacing:.06em;
+    border-bottom:1px solid #2b3a4d}
+  tr.key td{background:rgba(255,176,0,.07);font-weight:600}
+  .tagi{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 4px}
+  .tag{border:1px solid var(--linia);background:var(--karta);border-radius:999px;
+    padding:5px 12px;font-size:13px;color:#c3d2e6}
+  .pliki{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin:14px 0}
+  .plik{display:block;background:var(--karta);border:1px solid var(--linia);border-radius:12px;
+    padding:15px 16px;text-decoration:none;color:var(--tekst)}
+  .plik:hover{border-color:var(--akcent)}
+  .plik b{display:block;font-size:15px}
+  .plik span{color:var(--cichy);font-size:13px}
+  .uwaga{border-left:3px solid var(--bursztyn);background:rgba(255,176,0,.06);
+    padding:12px 16px;border-radius:0 10px 10px 0;margin:18px 0}
+  footer{margin:56px 0 40px;padding-top:18px;border-top:1px solid var(--linia);
+    color:var(--cichy);font-size:13px}
+  code{background:#0e1620;border:1px solid var(--linia);border-radius:5px;padding:1px 6px;font-size:13.5px}
+</style></head>
+<body><div class="w">
+
+<header>
+  <h1>15 minut</h1>
+  <p class="lead">Kto czeka dłużej na straż pożarną, zależy od mapy, na której to policzysz.</p>
+  <p class="kto">Dostępność ratownicza powiatu żywieckiego policzona na danych i usługach GUGiK —
+     z otwartym narzędziem dla każdego powiatu. Tomasz Zuchlke · 2026</p>
+</header>
+
+<section class="liczby">
+  <div class="l"><div class="v b">84,1%</div><div class="o">ludności w zasięgu 15 minut<br>według <b>BDOT10k</b> (GUGiK)</div></div>
+  <div class="l"><div class="v z">74,1%</div><div class="o">to samo, policzone<br>na <b>OpenStreetMap</b></div></div>
+  <div class="l"><div class="v">15 090</div><div class="o">osób w 6 168 budynkach<br>widzi tylko BDOT10k</div></div>
+  <div class="l"><div class="v">380</div><div class="o">powiatów — tyle można policzyć<br>tą samą metodą i narzędziem</div></div>
+</section>
+
+<figure>
+  <video controls preload="metadata" poster="mapy/mapa_a3.png">
+    <source src="film/15_minut.mp4" type="video/mp4">
+    Twoja przeglądarka nie odtworzy tego filmu — <a href="film/15_minut.mp4">pobierz plik</a>.
+  </video>
+  <figcaption>Wizualizacja 3D: zegar 00:00→15:00 dwa razy, w tym samym kadrze —
+    raz na OpenStreetMap, raz na BDOT10k. Bursztyn to budynki, które widzi tylko BDOT10k.</figcaption>
+</figure>
+
+<h2>Na czym polega praca</h2>
+<p>Policzyłem, jaki odsetek mieszkańców powiatu żywieckiego jednostki KSRG — JRG Żywiec
+i 33 OSP włączone do KSRG — są w stanie osiągnąć w 15 minut od zgłoszenia.
+<b>Tę samą analizę wykonałem dwa razy</b>, z tymi samymi jednostkami, mieszkańcami
+i parametrami. Różnią się wyłącznie dane o drogach.</p>
+
+<table>
+  <thead><tr><th>sieć dróg</th><th>≤ 8 min</th><th>≤ 15 min</th><th>w zasięgu 15 min</th></tr></thead>
+  <tbody>
+    <tr><td>OpenStreetMap (filtr jak w artykule)</td><td>12,6%</td><td>71,8%</td><td>106 097</td></tr>
+    <tr><td>OpenStreetMap + <code>service</code>/<code>track</code></td><td>13,3%</td><td>74,1%</td><td>109 460</td></tr>
+    <tr><td>OpenStreetMap, <code>tertiary</code> = 50 km/h <i>(test czułości)</i></td><td>17,6%</td><td>82,1%</td><td>121 345</td></tr>
+    <tr><td>BDOT10k — drogi publiczne</td><td>14,1%</td><td>76,6%</td><td>113 149</td></tr>
+    <tr class="key"><td>BDOT10k — wszystkie drogi</td><td>15,2%</td><td>84,1%</td><td>124 256</td></tr>
+    <tr><td>BDOT10k + dojście zależne od nachylenia (NMT, Tobler)</td><td>14,9%</td><td>83,3%</td><td>123 108</td></tr>
+  </tbody>
+</table>
+<p style="font-size:13.5px;color:#8ea2be">Ludność w modelu: 147 802 osoby w 52 278 budynkach mieszkalnych.</p>
+
+<h2>Skąd bierze się różnica</h2>
+<p>Najprostsze wytłumaczenie — że BDOT10k ma po prostu więcej dróg — <b>nie jest prawdziwe</b>.
+Po dołożeniu do OpenStreetMap dróg leśnych i dojazdowych sieć OSM liczy w tym powiecie
+<b>więcej</b> kilometrów niż BDOT10k, a wynik rośnie tylko o 2,3 p.p.</p>
+<p>Decyduje <b>kategoria zarządzania drogi</b>. W OpenStreetMap analityk musi założyć, czym jest
+<code>tertiary</code> — drogą powiatową czy gminną. Od tego jednego założenia ten sam powiat ma
+<b>74,1% albo 82,1%</b>, bez zmiany choćby jednego metra sieci. BDOT10k niesie kategorię
+i nawierzchnię każdej drogi jako atrybut urzędowy, jednolity w całym kraju.</p>
+<div class="uwaga"><b>To jest cała teza tej pracy:</b> BDOT10k zamienia <i>założenie analityka</i>
+  na <i>atrybut urzędowy</i> — i dlatego daje jedną odpowiedź, porównywalną między powiatami i latami.</div>
+
+<h3>Gdzie ta różnica leży</h3>
+<figure>
+  <img src="mapy/wykres_gmin.png" alt="Porównanie gmin: OpenStreetMap wobec BDOT10k">
+  <figcaption>W <b>mieście Żywiec</b> różnica znika (99,9% wobec 99,8%). Cała przewaga BDOT10k
+    powstaje w gminach górskich — tam, gdzie pomoc i tak jedzie najdłużej.</figcaption>
+</figure>
+
+<h2>Dane i usługi GUGiK</h2>
+<div class="tagi">
+  <span class="tag">BDOT10k — opendata</span>
+  <span class="tag">NMT — usługa WCS</span>
+  <span class="tag">Ortofotomapa — usługa WMS</span>
+  <span class="tag">PRG — usługa WFS</span>
+</div>
+<p>Z BDOT10k pochodzą: sieć dróg z kategorią zarządzania i nawierzchnią, budynki mieszkalne,
+ludność miejscowości, granice gmin oraz cieki, wody i tory jako bariery.
+OpenStreetMap posłużył <b>wyłącznie jako punkt odniesienia</b> w porównaniu; wykaz jednostek
+pochodzi z KG PSP, bo GUGiK nie prowadzi rejestru jednostek ratowniczych.</p>
+
+<h2>Narzędzie — i to jest druga połowa tej pracy</h2>
+<p>Analizę liczy bezpłatna wtyczka QGIS <b>„Izochrony AZO"</b> (kod otwarty, licencja MIT).
+Od wersji 1.8 wtyczka <b>sama pobiera dane z GUGiK</b>: podajesz numer TERYT powiatu, a ona
+ściąga BDOT10k z opendata i NMT z usługi WCS, po czym składa gotowy komplet warstw.</p>
+<p>Dzięki temu to opracowanie da się powtórzyć dla <b>dowolnego z 380 powiatów</b> — bez ręcznego
+przygotowywania danych, bez kluczy API i bez danych komercyjnych.
+Metoda opisana w recenzowanym artykule:
+<a href="https://doi.org/10.5604/01.3001.0055.9211">Zeszyty Naukowe SGSP, doi:10.5604/01.3001.0055.9211</a>.</p>
+
+<h2>Materiały</h2>
+<div class="pliki">
+  <a class="plik" href="raport/raport.pdf"><b>Raport PDF</b><span>3 strony — metoda, wyniki 15 gmin, ograniczenia</span></a>
+  <a class="plik" href="mapy/mapa_a3.pdf"><b>Mapa A3 PDF</b><span>do wydruku, 300 dpi</span></a>
+  <a class="plik" href="film/15_minut.mp4"><b>Film MP4</b><span>60 s, 1920×1080</span></a>
+  <a class="plik" href="https://github.com/Tzargath/azo-osm/tree/main/15-minut-zywiec/skrypty"><b>Skrypty</b><span>odtwarzają wszystkie liczby od zera</span></a>
+  <a class="plik" href="https://github.com/Tzargath/azo-osm/tree/main/qgis_plugin"><b>Wtyczka QGIS 1.8</b><span>z pobieraniem danych GUGiK</span></a>
+  <a class="plik" href="https://github.com/Tzargath/azo-osm/tree/main/15-minut-zywiec/wyniki"><b>Logi wariantów</b><span>surowe parametry sześciu przebiegów</span></a>
+</div>
+
+<h2>Czego ta praca nie rozstrzyga</h2>
+<p>Model liczy <b>czas dojazdu</b>, nie czas interwencji — nie obejmuje dysponowania, zbiórki
+ratowników OSP ani warunków drogowych w danej chwili. Prędkości są planistyczne, przypisane
+kategorii drogi, a nie zmierzone w ruchu. Ludność jest rozłożona na budynki mieszkalne
+proporcjonalnie, w granicach miejscowości. Wynik dla OpenStreetMap zależy od dnia pobrania.</p>
+
+<footer>
+  Opracowanie prywatne. Nie stanowi stanowiska Państwowej Straży Pożarnej.
+  Wykorzystano wyłącznie dane i usługi publicznie dostępne.<br>
+  Dane: © GUGiK · Porównanie: © współtwórcy OpenStreetMap (ODbL) ·
+  Kod: licencja MIT · Tomasz Zuchlke
+</footer>
+
+</div></body></html>
