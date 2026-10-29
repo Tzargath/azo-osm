@@ -57,8 +57,15 @@ hill.renderer().setOpacity(0.42 if os.path.exists(orto_p) else 0.9)
 hill.setBlendMode(QPainter.CompositionMode.CompositionMode_Multiply)
 if os.path.exists(orto_p):
     orto = raster(orto_p, "Ortofotomapa")
-    hs = orto.hueSaturationFilter(); hs.setSaturation(-55)
-    bc = orto.brightnessFilter(); bc.setBrightness(-18); bc.setContrast(-10)
+    # ⚠⚠ ORTOFOTOMAPA GUGiK JEST PATCHWORKIEM RÓŻNYCH NALOTÓW. Zmierzone 29.10:
+    #   średnia jasność kafli 4,5 km waha się 52–116 WEWNĄTRZ powiatu, a skok na szwach
+    #   NASZEGO pobierania wynosi ±0,4 (mniej niż losowe miejsca w środku kafla, do 2,1)
+    #   ⇒ mozaika jest bezszwowa, a prostokąty to granice bloków nalotowych w ŹRÓDLE.
+    #   Nie wyrównujemy ich histogramem — to byłoby fałszowanie danych. Zamiast tego
+    #   ortofoto gra rolę TŁA: mocniej odbarwione i spłaszczone kontrastowo, żeby
+    #   różnice między nalotami nie konkurowały z warstwą merytoryczną.
+    hs = orto.hueSaturationFilter(); hs.setSaturation(-78)
+    bc = orto.brightnessFilter(); bc.setBrightness(4); bc.setContrast(-38)
 
 powiat = warstwa(f"{W}|layername=powiat", "powiat")
 gminy = warstwa(f"{W}|layername=gminy", "gminy")
@@ -226,7 +233,7 @@ etykieta("powiat żywiecki (2417)<br><span style='color:#5d6670'>woj. śląskie 
 # liczby kluczowe
 Y = MY + 77
 ramka(RX, Y, RW, 46, fill="#fff6e0")
-etykieta(f"{pct_bdot:.1f}%".replace(".", ","), RX + 4, Y + 3, 40, 14, 24, True, "#b36b00")
+etykieta(f"{pct_bdot:.1f}%".replace(".", ","), RX + 4, Y + 3, 40, 14, 24, True, "#3f8f4f")
 etykieta("mieszkańców<br>w zasięgu 15 min<br>według <b>BDOT10k</b>", RX + 38, Y + 4.5, RW - 40, 13, 7, html=True)
 etykieta(f"{pct_osm:.1f}%".replace(".", ","), RX + 4, Y + 18, 40, 12, 18, True, "#6b7480")
 etykieta("według <b>OpenStreetMap</b><br>(z drogami service/track)", RX + 38, Y + 19.5, RW - 38, 10, 7, html=True)
