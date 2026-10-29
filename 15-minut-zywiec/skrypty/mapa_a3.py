@@ -74,7 +74,11 @@ jedn = warstwa(f"{W}|layername=jednostki_ksrg", "jednostki")
 
 # maska poza powiatem — rozjaśnia i wycisza otoczenie
 maska = warstwa(f"{W}|layername=powiat", "maska")
-fs = QgsFillSymbol.createSimple({"color": "246,247,248,215", "outline_style": "no"})
+# ⛔⛔ MASKA NIEPRZEZROCZYSTA (alfa 255, było 215). Przez półprzezroczystą prześwitywały
+#   bloki ortofotomapy poza powiatem — równe prostokąty o różnej jasności i schodkowa
+#   krawędź tam, gdzie kafli nie ma (Słowacja). Na mapie tematycznej poza obszarem
+#   analizy nie powinno być NIC: to nie jest kontekst, tylko szum.
+fs = QgsFillSymbol.createSimple({"color": "246,247,248,255", "outline_style": "no"})
 maska.setRenderer(QgsInvertedPolygonRenderer(QgsSingleSymbolRenderer(fs)))
 
 gminy.setRenderer(QgsSingleSymbolRenderer(QgsFillSymbol.createSimple(
