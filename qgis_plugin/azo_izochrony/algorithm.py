@@ -117,13 +117,13 @@ class IzochronyAZOAlgorithm(QgsProcessingAlgorithm):
         )
 
     def _adv(self, p):
-        p.setFlags(p.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+        p.setFlags(p.flags() | QgsProcessingParameterDefinition.Flag.FlagAdvanced)
         return p
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterVectorLayer(
             self.NETWORK, self.tr('Sieć dróg (linie, układ metryczny)'),
-            [QgsProcessing.TypeVectorLine]))
+            [QgsProcessing.SourceType.TypeVectorLine]))
         self.addParameter(QgsProcessingParameterEnum(
             self.SPEED_MODE, self.tr('Reżim prędkości'),
             options=[self.tr('planistyczny (wg kategorii drogi) — domyślny KG PSP'),
@@ -139,17 +139,17 @@ class IzochronyAZOAlgorithm(QgsProcessingAlgorithm):
             headers=[self.tr('Klasa/kategoria drogi'), self.tr('km/h')], defaultValue=DEF_SPEEDS))
         self.addParameter(self._adv(QgsProcessingParameterField(
             self.VMAX_FIELD, self.tr('Pole prędkości dopuszczalnej vmax (operacyjny/dopuszczalny)'),
-            parentLayerParameterName=self.NETWORK, type=QgsProcessingParameterField.Numeric,
+            parentLayerParameterName=self.NETWORK, type=QgsProcessingParameterField.DataType.Numeric,
             optional=True)))
         self.addParameter(self._adv(QgsProcessingParameterNumber(
             self.OP_FACTOR, self.tr('Współczynnik operacyjny (× vmax)'),
-            QgsProcessingParameterNumber.Double, defaultValue=OPERATIONAL_FACTOR, minValue=0.1, maxValue=1.5)))
+            QgsProcessingParameterNumber.Type.Double, defaultValue=OPERATIONAL_FACTOR, minValue=0.1, maxValue=1.5)))
         self.addParameter(self._adv(QgsProcessingParameterNumber(
             self.DEFAULT_SPEED, self.tr('Prędkość domyślna [km/h] (klasa/vmax spoza tabeli/brak)'),
-            QgsProcessingParameterNumber.Double, defaultValue=DEFAULT_SPEED, minValue=1)))
+            QgsProcessingParameterNumber.Type.Double, defaultValue=DEFAULT_SPEED, minValue=1)))
 
         self.addParameter(QgsProcessingParameterFeatureSource(
-            self.POINTS, self.tr('Jednostki (punkty)'), [QgsProcessing.TypeVectorPoint]))
+            self.POINTS, self.tr('Jednostki (punkty)'), [QgsProcessing.SourceType.TypeVectorPoint]))
         self.addParameter(QgsProcessingParameterField(
             self.TYPE_FIELD, self.tr('Pole typu jednostki (do czasu alarmowania)'),
             parentLayerParameterName=self.POINTS, optional=True))
@@ -159,38 +159,38 @@ class IzochronyAZOAlgorithm(QgsProcessingAlgorithm):
             headers=[self.tr('Wartość pola typu'), self.tr('min')], defaultValue=DEF_ALARM))
         self.addParameter(self._adv(QgsProcessingParameterNumber(
             self.DEFAULT_ALARM, self.tr('Alarmowanie domyślne [min] (typ spoza tabeli)'),
-            QgsProcessingParameterNumber.Double, defaultValue=DEFAULT_ALARM, minValue=0)))
+            QgsProcessingParameterNumber.Type.Double, defaultValue=DEFAULT_ALARM, minValue=0)))
 
         self.addParameter(QgsProcessingParameterString(
             self.THRESHOLDS, self.tr('Progi czasu dotarcia [min] (15 = wiążący; np. "8,15")'),
             defaultValue=DEFAULT_THRESHOLDS))
         self.addParameter(QgsProcessingParameterNumber(
             self.OFFROAD_SPEED, self.tr('Prędkość dojścia/ostatniego odcinka v_poza [km/h]'),
-            QgsProcessingParameterNumber.Double, defaultValue=DEFAULT_OFFROAD_KMH, minValue=1,
+            QgsProcessingParameterNumber.Type.Double, defaultValue=DEFAULT_OFFROAD_KMH, minValue=1,
             ))
         self.addParameter(QgsProcessingParameterNumber(
             self.OFFROAD_MAX, self.tr('Maks. dojście poza drogą R_max [m]'),
-            QgsProcessingParameterNumber.Double, defaultValue=DEFAULT_RMAX_M, minValue=0))
+            QgsProcessingParameterNumber.Type.Double, defaultValue=DEFAULT_RMAX_M, minValue=0))
         self.addParameter(self._adv(QgsProcessingParameterString(
             self.NO_OFFROAD_CLASSES,
             self.tr('Klasy bez dojścia poza drogą (ograniczony dostęp A/S), po przecinku'),
             defaultValue=DEF_NO_OFFROAD_CLASSES, optional=True)))
         self.addParameter(QgsProcessingParameterFeatureSource(
             self.BARRIERS, self.tr('Bariery do odjęcia (rzeki, tory, tereny zamknięte) — opcjonalne'),
-            [QgsProcessing.TypeVectorPolygon, QgsProcessing.TypeVectorLine], optional=True))
+            [QgsProcessing.SourceType.TypeVectorPolygon, QgsProcessing.SourceType.TypeVectorLine], optional=True))
         self.addParameter(self._adv(QgsProcessingParameterNumber(
             self.DENSIFY, self.tr('Zagęszczenie krawędzi [m]'),
-            QgsProcessingParameterNumber.Double, defaultValue=40.0, minValue=5)))
+            QgsProcessingParameterNumber.Type.Double, defaultValue=40.0, minValue=5)))
         self.addParameter(QgsProcessingParameterNumber(
             self.MIN_AREA, self.tr('Usuń wysepki mniejsze niż [ha] (0 = bez filtra)'),
-            QgsProcessingParameterNumber.Double, defaultValue=1.0, minValue=0))
+            QgsProcessingParameterNumber.Type.Double, defaultValue=1.0, minValue=0))
         self.addParameter(self._adv(QgsProcessingParameterBoolean(
             self.SMOOTH, self.tr('Wygładź krawędzie stref'), defaultValue=True)))
         self.addParameter(self._adv(QgsProcessingParameterNumber(
             self.TOLERANCE, self.tr('Tolerancja sklejania węzłów [m]'),
-            QgsProcessingParameterNumber.Double, defaultValue=25.0, minValue=0)))
+            QgsProcessingParameterNumber.Type.Double, defaultValue=25.0, minValue=0)))
         self.addParameter(QgsProcessingParameterFeatureSink(
-            self.OUTPUT, self.tr('Izochrony (poligony)'), QgsProcessing.TypeVectorPolygon))
+            self.OUTPUT, self.tr('Izochrony (poligony)'), QgsProcessing.SourceType.TypeVectorPolygon))
 
     # ------------------------------------------------------------------ helpers
     @staticmethod
@@ -316,7 +316,7 @@ class IzochronyAZOAlgorithm(QgsProcessingAlgorithm):
         # Wtedy cost[v] = min po jednostkach (alarmowanie + dojazd) = czas dotarcia z najszybszej
         # jednostki, z automatycznym wyborem najbliższej. Skala województwa: minuty -> ~kilkadziesiąt s.
         feedback.pushInfo(self.tr('Budowa grafu i analiza dojazdu (superźródło, 1 Dijkstra)…'))
-        director = QgsVectorLayerDirector(mem, -1, '', '', '', QgsVectorLayerDirector.DirectionBoth)
+        director = QgsVectorLayerDirector(mem, -1, '', '', '', QgsVectorLayerDirector.Direction.DirectionBoth)
         director.addStrategy(QgsNetworkSpeedStrategy(
             mem.fields().lookupField('vkmh'), float(default_speed), 1000.0 / 3600.0))
         director.addStrategy(_OffroadFlagStrategy(mem.fields().lookupField('offroad')))
@@ -358,7 +358,7 @@ class IzochronyAZOAlgorithm(QgsProcessingAlgorithm):
         out_fields.append(QgsField('prog_min', QVariant.Double))
         out_fields.append(QgsField('rezim', QVariant.String))
         (sink, dest_id) = self.parameterAsSink(
-            parameters, self.OUTPUT, context, out_fields, QgsWkbTypes.MultiPolygon, crs)
+            parameters, self.OUTPUT, context, out_fields, QgsWkbTypes.Type.MultiPolygon, crs)
         if sink is None:
             raise QgsProcessingException(self.tr('Nie udało się utworzyć warstwy wynikowej.'))
 

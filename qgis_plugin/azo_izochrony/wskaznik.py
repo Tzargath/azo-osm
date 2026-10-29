@@ -87,12 +87,12 @@ class WskaznikPokryciaAlgorithm(QgsProcessingAlgorithm):
         )
 
     def _adv(self, p):
-        p.setFlags(p.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+        p.setFlags(p.flags() | QgsProcessingParameterDefinition.Flag.FlagAdvanced)
         return p
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterVectorLayer(
-            self.NETWORK, self.tr('Sieć dróg (linie, układ metryczny)'), [QgsProcessing.TypeVectorLine]))
+            self.NETWORK, self.tr('Sieć dróg (linie, układ metryczny)'), [QgsProcessing.SourceType.TypeVectorLine]))
         self.addParameter(QgsProcessingParameterField(
             self.CLASS_FIELD, self.tr('Pole klasy drogi (np. highway)'),
             parentLayerParameterName=self.NETWORK, defaultValue='highway', optional=True))
@@ -102,9 +102,9 @@ class WskaznikPokryciaAlgorithm(QgsProcessingAlgorithm):
             headers=[self.tr('Klasa drogi'), self.tr('km/h')], defaultValue=DEF_SPEEDS))
         self.addParameter(self._adv(QgsProcessingParameterNumber(
             self.DEFAULT_SPEED, self.tr('Prędkość domyślna [km/h]'),
-            QgsProcessingParameterNumber.Double, defaultValue=30.0, minValue=1)))
+            QgsProcessingParameterNumber.Type.Double, defaultValue=30.0, minValue=1)))
         self.addParameter(QgsProcessingParameterFeatureSource(
-            self.POINTS, self.tr('Jednostki (punkty)'), [QgsProcessing.TypeVectorPoint]))
+            self.POINTS, self.tr('Jednostki (punkty)'), [QgsProcessing.SourceType.TypeVectorPoint]))
         self.addParameter(QgsProcessingParameterField(
             self.TYPE_FIELD, self.tr('Pole typu jednostki (do czasu alarmowania)'),
             parentLayerParameterName=self.POINTS, optional=True))
@@ -114,30 +114,30 @@ class WskaznikPokryciaAlgorithm(QgsProcessingAlgorithm):
             headers=[self.tr('Wartość pola typu'), self.tr('min')], defaultValue=DEF_ALARM))
         self.addParameter(self._adv(QgsProcessingParameterNumber(
             self.DEFAULT_ALARM, self.tr('Alarmowanie domyślne [min]'),
-            QgsProcessingParameterNumber.Double, defaultValue=10.0, minValue=0)))
+            QgsProcessingParameterNumber.Type.Double, defaultValue=10.0, minValue=0)))
         self.addParameter(QgsProcessingParameterFeatureSource(
-            self.DEMAND, self.tr('Punkty popytu (ludność)'), [QgsProcessing.TypeVectorPoint]))
+            self.DEMAND, self.tr('Punkty popytu (ludność)'), [QgsProcessing.SourceType.TypeVectorPoint]))
         self.addParameter(QgsProcessingParameterField(
             self.POP_FIELD, self.tr('Pole ludności (waga); puste = punkty liczone po 1'),
-            parentLayerParameterName=self.DEMAND, type=QgsProcessingParameterField.Numeric, optional=True))
+            parentLayerParameterName=self.DEMAND, type=QgsProcessingParameterField.DataType.Numeric, optional=True))
         self.addParameter(QgsProcessingParameterString(
             self.THRESHOLDS, self.tr('Progi czasu dotarcia [min]'), defaultValue='8,15'))
         self.addParameter(QgsProcessingParameterNumber(
             self.OFFROAD_SPEED, self.tr('Prędkość dojścia/ostatniego odcinka [km/h]'),
-            QgsProcessingParameterNumber.Double, defaultValue=DEFAULT_OFFROAD_KMH, minValue=1))
+            QgsProcessingParameterNumber.Type.Double, defaultValue=DEFAULT_OFFROAD_KMH, minValue=1))
         self.addParameter(QgsProcessingParameterNumber(
             self.OFFROAD_MAX, self.tr('Maks. dojście poza drogą R_max [m]'),
-            QgsProcessingParameterNumber.Double, defaultValue=300.0, minValue=0))
+            QgsProcessingParameterNumber.Type.Double, defaultValue=300.0, minValue=0))
         self.addParameter(QgsProcessingParameterRasterLayer(
             self.DEM, self.tr('NMT — dojście zależne od nachylenia (Tobler), opcjonalnie'), optional=True))
         self.addParameter(QgsProcessingParameterFeatureSource(
             self.BARRIERS, self.tr('Bariery (rzeki, tory, tereny zamknięte) — opcjonalne'),
-            [QgsProcessing.TypeVectorPolygon, QgsProcessing.TypeVectorLine], optional=True))
+            [QgsProcessing.SourceType.TypeVectorPolygon, QgsProcessing.SourceType.TypeVectorLine], optional=True))
         self.addParameter(self._adv(QgsProcessingParameterNumber(
             self.TOLERANCE, self.tr('Tolerancja sklejania węzłów [m]'),
-            QgsProcessingParameterNumber.Double, defaultValue=25.0, minValue=0)))
+            QgsProcessingParameterNumber.Type.Double, defaultValue=25.0, minValue=0)))
         self.addParameter(QgsProcessingParameterFeatureSink(
-            self.OUTPUT, self.tr('Punkty popytu z pokryciem'), QgsProcessing.TypeVectorPoint))
+            self.OUTPUT, self.tr('Punkty popytu z pokryciem'), QgsProcessing.SourceType.TypeVectorPoint))
 
     @staticmethod
     def _matrix_to_map(values):
@@ -222,7 +222,7 @@ class WskaznikPokryciaAlgorithm(QgsProcessingAlgorithm):
 
         # --- superwęzeł: 1 Dijkstra -> czas dotarcia w każdym węźle ---
         feedback.pushInfo(self.tr('Analiza dojazdu (superwęzeł, 1 Dijkstra)…'))
-        director = QgsVectorLayerDirector(mem, -1, '', '', '', QgsVectorLayerDirector.DirectionBoth)
+        director = QgsVectorLayerDirector(mem, -1, '', '', '', QgsVectorLayerDirector.Direction.DirectionBoth)
         director.addStrategy(QgsNetworkSpeedStrategy(mem.fields().lookupField('vkmh'), float(default_speed), 1000.0 / 3600.0))
         builder = QgsGraphBuilder(crs, False, tol)
         tied = director.makeGraph(builder, points)
@@ -298,7 +298,7 @@ class WskaznikPokryciaAlgorithm(QgsProcessingAlgorithm):
         for T in thresholds:
             out_fields.append(QgsField('pokr_%dmin' % int(round(T)), QVariant.Int))
         (sink, dest_id) = self.parameterAsSink(parameters, self.OUTPUT, context, out_fields,
-                                               QgsWkbTypes.Point, crs)
+                                               QgsWkbTypes.Type.Point, crs)
         if sink is None:
             raise QgsProcessingException(self.tr('Nie udało się utworzyć warstwy wynikowej.'))
 

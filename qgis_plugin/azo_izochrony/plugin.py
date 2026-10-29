@@ -47,10 +47,9 @@ class AzoPlugin:
         self.button.setIcon(icon)
         self.button.setToolTip('Izochrony AZO (PSP) — wybierz narzędzie')
         self.button.setMenu(self.popup)
-        try:
-            self.button.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
-        except AttributeError:
-            self.button.setPopupMode(QToolButton.InstantPopup)
+        # Qt6 ma enum w zasięgu klasy, Qt5 trzyma go płasko na QToolButton.
+        tryb = getattr(QToolButton, 'ToolButtonPopupMode', QToolButton)
+        self.button.setPopupMode(tryb.InstantPopup)
 
         self.toolbar = self.iface.addToolBar('Izochrony AZO')
         self.toolbar.setObjectName('AzoIzochronyToolbar')

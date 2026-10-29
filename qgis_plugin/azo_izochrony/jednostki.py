@@ -75,12 +75,12 @@ class PokrycieJednostkiAlgorithm(QgsProcessingAlgorithm):
         )
 
     def _adv(self, p):
-        p.setFlags(p.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+        p.setFlags(p.flags() | QgsProcessingParameterDefinition.Flag.FlagAdvanced)
         return p
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterVectorLayer(
-            self.NETWORK, self.tr('Sieć dróg (linie, układ metryczny)'), [QgsProcessing.TypeVectorLine]))
+            self.NETWORK, self.tr('Sieć dróg (linie, układ metryczny)'), [QgsProcessing.SourceType.TypeVectorLine]))
         self.addParameter(QgsProcessingParameterField(
             self.CLASS_FIELD, self.tr('Pole klasy drogi (np. highway)'),
             parentLayerParameterName=self.NETWORK, defaultValue='highway', optional=True))
@@ -90,9 +90,9 @@ class PokrycieJednostkiAlgorithm(QgsProcessingAlgorithm):
             headers=[self.tr('Klasa drogi'), self.tr('km/h')], defaultValue=DEF_SPEEDS))
         self.addParameter(self._adv(QgsProcessingParameterNumber(
             self.DEFAULT_SPEED, self.tr('Prędkość domyślna [km/h]'),
-            QgsProcessingParameterNumber.Double, defaultValue=30.0, minValue=1)))
+            QgsProcessingParameterNumber.Type.Double, defaultValue=30.0, minValue=1)))
         self.addParameter(QgsProcessingParameterFeatureSource(
-            self.POINTS, self.tr('Jednostki (punkty)'), [QgsProcessing.TypeVectorPoint]))
+            self.POINTS, self.tr('Jednostki (punkty)'), [QgsProcessing.SourceType.TypeVectorPoint]))
         self.addParameter(QgsProcessingParameterField(
             self.TYPE_FIELD, self.tr('Pole typu jednostki (do alarmowania)'),
             parentLayerParameterName=self.POINTS, optional=True))
@@ -102,15 +102,15 @@ class PokrycieJednostkiAlgorithm(QgsProcessingAlgorithm):
             headers=[self.tr('Wartość pola typu'), self.tr('min')], defaultValue=DEF_ALARM))
         self.addParameter(self._adv(QgsProcessingParameterNumber(
             self.DEFAULT_ALARM, self.tr('Alarmowanie domyślne [min]'),
-            QgsProcessingParameterNumber.Double, defaultValue=10.0, minValue=0)))
+            QgsProcessingParameterNumber.Type.Double, defaultValue=10.0, minValue=0)))
         self.addParameter(QgsProcessingParameterFeatureSource(
-            self.DEMAND, self.tr('Punkty popytu (ludność)'), [QgsProcessing.TypeVectorPoint]))
+            self.DEMAND, self.tr('Punkty popytu (ludność)'), [QgsProcessing.SourceType.TypeVectorPoint]))
         self.addParameter(QgsProcessingParameterField(
             self.POP_FIELD, self.tr('Pole ludności (waga); puste = po 1'),
-            parentLayerParameterName=self.DEMAND, type=QgsProcessingParameterField.Numeric, optional=True))
+            parentLayerParameterName=self.DEMAND, type=QgsProcessingParameterField.DataType.Numeric, optional=True))
         self.addParameter(QgsProcessingParameterFeatureSource(
             self.ADMIN, self.tr('Jednostki administracyjne (poligony: powiaty/gminy)'),
-            [QgsProcessing.TypeVectorPolygon]))
+            [QgsProcessing.SourceType.TypeVectorPolygon]))
         self.addParameter(QgsProcessingParameterField(
             self.NAME_FIELD, self.tr('Pole nazwy jednostki (do podpisu)'),
             parentLayerParameterName=self.ADMIN, defaultValue='name', optional=True))
@@ -118,18 +118,18 @@ class PokrycieJednostkiAlgorithm(QgsProcessingAlgorithm):
             self.THRESHOLDS, self.tr('Progi czasu dotarcia [min]'), defaultValue='8,15'))
         self.addParameter(QgsProcessingParameterNumber(
             self.OFFROAD_SPEED, self.tr('Prędkość dojścia [km/h]'),
-            QgsProcessingParameterNumber.Double, defaultValue=10.0, minValue=1))
+            QgsProcessingParameterNumber.Type.Double, defaultValue=10.0, minValue=1))
         self.addParameter(QgsProcessingParameterNumber(
             self.OFFROAD_MAX, self.tr('Maks. dojście poza drogą R_max [m]'),
-            QgsProcessingParameterNumber.Double, defaultValue=300.0, minValue=0))
+            QgsProcessingParameterNumber.Type.Double, defaultValue=300.0, minValue=0))
         self.addParameter(QgsProcessingParameterFeatureSource(
             self.BARRIERS, self.tr('Bariery (rzeki, tory) — opcjonalne'),
-            [QgsProcessing.TypeVectorPolygon, QgsProcessing.TypeVectorLine], optional=True))
+            [QgsProcessing.SourceType.TypeVectorPolygon, QgsProcessing.SourceType.TypeVectorLine], optional=True))
         self.addParameter(self._adv(QgsProcessingParameterNumber(
             self.TOLERANCE, self.tr('Tolerancja sklejania węzłów [m]'),
-            QgsProcessingParameterNumber.Double, defaultValue=25.0, minValue=0)))
+            QgsProcessingParameterNumber.Type.Double, defaultValue=25.0, minValue=0)))
         self.addParameter(QgsProcessingParameterFeatureSink(
-            self.OUTPUT, self.tr('Jednostki z % pokrycia'), QgsProcessing.TypeVectorPolygon))
+            self.OUTPUT, self.tr('Jednostki z % pokrycia'), QgsProcessing.SourceType.TypeVectorPolygon))
 
     @staticmethod
     def _matrix_to_map(values):
@@ -205,7 +205,7 @@ class PokrycieJednostkiAlgorithm(QgsProcessingAlgorithm):
 
         # --- superwęzeł: 1 Dijkstra ---
         feedback.pushInfo(self.tr('Analiza dojazdu (superwęzeł)…'))
-        director = QgsVectorLayerDirector(mem, -1, '', '', '', QgsVectorLayerDirector.DirectionBoth)
+        director = QgsVectorLayerDirector(mem, -1, '', '', '', QgsVectorLayerDirector.Direction.DirectionBoth)
         director.addStrategy(QgsNetworkSpeedStrategy(mem.fields().lookupField('vkmh'), float(default_speed), 1000.0 / 3600.0))
         builder = QgsGraphBuilder(crs, False, tol)
         tied = director.makeGraph(builder, points)
@@ -334,7 +334,7 @@ class PokrycieJednostkiAlgorithm(QgsProcessingAlgorithm):
         for T in thresholds:
             out_fields.append(QgsField('pokr_%dmin_pct' % int(round(T)), QVariant.Double))
         (sink, dest_id) = self.parameterAsSink(parameters, self.OUTPUT, context, out_fields,
-                                               QgsWkbTypes.MultiPolygon, crs)
+                                               QgsWkbTypes.Type.MultiPolygon, crs)
         if sink is None:
             raise QgsProcessingException(self.tr('Nie udało się utworzyć warstwy wynikowej.'))
         feedback.pushInfo('—' * 30)
@@ -363,7 +363,7 @@ class PokrycieJednostkiAlgorithm(QgsProcessingAlgorithm):
             ramp = QgsStyle.defaultStyle().colorRamp('Greens')
             base = QgsFillSymbol.createSimple({'outline_color': '110,110,110', 'outline_width': '0.12'})
             ren = QgsGraduatedSymbolRenderer.createRenderer(
-                layer, self._pct_field, 5, QgsGraduatedSymbolRenderer.Jenks, base, ramp)
+                layer, self._pct_field, 5, QgsGraduatedSymbolRenderer.Mode.Jenks, base, ramp)
             layer.setRenderer(ren)
             # etykieta na centroidzie: nazwa + %
             ls = QgsPalLayerSettings(); ls.fieldName = 'concat("nazwa", \'\\n\', round("%s"), \'%%\')' % self._pct_field

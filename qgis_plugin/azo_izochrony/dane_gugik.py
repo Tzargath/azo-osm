@@ -128,7 +128,7 @@ class DaneGugikAlgorithm(QgsProcessingAlgorithm):
             defaultValue=False))
         self.addParameter(QgsProcessingParameterNumber(
             self.NMT_RES, self.tr('Rozdzielczość NMT [m]'),
-            QgsProcessingParameterNumber.Double, defaultValue=10.0, minValue=1.0, maxValue=100.0))
+            QgsProcessingParameterNumber.Type.Double, defaultValue=10.0, minValue=1.0, maxValue=100.0))
         self.addParameter(QgsProcessingParameterFolderDestination(
             self.NMT_KAT, self.tr('Katalog na NMT (gdy pobierany)'), optional=True))
 
@@ -266,10 +266,10 @@ class DaneGugikAlgorithm(QgsProcessingAlgorithm):
                 opcje.driverName = 'GPKG'
                 opcje.layerName = klasa
                 opcje.actionOnExistingFile = (
-                    QgsVectorFileWriter.CreateOrOverwriteFile if not zapisane
-                    else QgsVectorFileWriter.CreateOrOverwriteLayer)
+                    QgsVectorFileWriter.ActionOnExistingFile.CreateOrOverwriteFile if not zapisane
+                    else QgsVectorFileWriter.ActionOnExistingFile.CreateOrOverwriteLayer)
                 err = QgsVectorFileWriter.writeAsVectorFormatV3(warstwa, wyjscie, opcje_ctx, opcje)
-                if err[0] != QgsVectorFileWriter.NoError:
+                if err[0] != QgsVectorFileWriter.WriterError.NoError:
                     raise QgsProcessingException(
                         self.tr('Zapis warstwy {0} nie powiódł się: {1}').format(klasa, err[1]))
                 zapisane.append(klasa)
