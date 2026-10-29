@@ -44,6 +44,10 @@
   .plik{display:block;background:var(--karta);border:1px solid var(--linia);border-radius:12px;
     padding:15px 16px;text-decoration:none;color:var(--tekst)}
   .plik:hover{border-color:var(--akcent)}
+  .ramka{display:block}
+  .ramka:hover img{border-color:var(--akcent)}
+  a.pod{display:inline-block;margin-top:6px;color:var(--akcent);text-decoration:none;font-weight:600}
+  a.pod:hover{text-decoration:underline}
   .plik b{display:block;font-size:15px}
   .plik span{color:var(--cichy);font-size:13px}
   .uwaga{border-left:3px solid var(--bursztyn);background:rgba(255,176,0,.06);
@@ -69,13 +73,15 @@
 </section>
 
 <figure>
-  <video controls preload="metadata" poster="mapy/mapa_a3.png">
+  <video controls preload="metadata" poster="film/plakat.jpg">
     <source src="film/15_minut.mp4" type="video/mp4">
     Twoja przeglądarka nie odtworzy tego filmu — <a href="film/15_minut.mp4">pobierz plik</a>.
   </video>
   <figcaption>Wizualizacja 3D: zegar 00:00→15:00 dwa razy, w tym samym kadrze —
-    raz na OpenStreetMap, raz na BDOT10k. Bursztyn to budynki, które widzi tylko BDOT10k.</figcaption>
+    raz na OpenStreetMap, raz na BDOT10k. Bursztyn to budynki, które widzi tylko BDOT10k.
+    <a class="pod" href="film/15_minut.mp4" download>Pobierz film MP4 (60 s, 1920×1080, 6,3 MB)</a></figcaption>
 </figure>
+
 
 <h2>Na czym polega praca</h2>
 <p>Policzyłem, jaki odsetek mieszkańców powiatu żywieckiego jednostki KSRG — JRG Żywiec
@@ -95,6 +101,14 @@ i parametrami. Różnią się wyłącznie dane o drogach.</p>
   </tbody>
 </table>
 <p style="font-size:13.5px;color:#8ea2be">Ludność w modelu: 147 802 osoby w 52 278 budynkach mieszkalnych.</p>
+
+<figure>
+  <a class="ramka" href="mapy/mapa_a3.pdf">
+    <img src="mapy/mapa_a3_podglad.jpg" alt="Mapa A3: zasięg 15 minut jednostek KSRG w powiecie żywieckim, BDOT10k wobec OpenStreetMap">
+  </a>
+  <figcaption>Mapa A3 — kliknij, aby otworzyć pełną wersję.
+    <a class="pod" href="mapy/mapa_a3.pdf">Otwórz mapę A3 (PDF do wydruku, 300 dpi, 3 MB)</a></figcaption>
+</figure>
 
 <h2>Skąd bierze się różnica</h2>
 <p>Najprostsze wytłumaczenie — że BDOT10k ma po prostu więcej dróg — <b>nie jest prawdziwe</b>.
