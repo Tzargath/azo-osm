@@ -470,6 +470,10 @@ class IzochronyAZOAlgorithm(QgsProcessingAlgorithm):
             layer.setRenderer(QgsCategorizedSymbolRenderer('prog_min', cats))
             layer.setName(self.tr('Strefy dojazdu (izochrony)'))
             layer.triggerRepaint()
-        except Exception:
-            pass
+        except Exception as e:
+            # ⚠ Stylizacja wyniku to DODATEK — warstwa ma powstać nawet, gdy ostylowanie
+            #   padnie (inna wersja QGIS, brak atrybutu). Ale „padło i nikt się nie dowiedział"
+            #   to nie jest obsługa błędu: zapisujemy powód do logu QGIS-a.
+            from qgis.core import Qgis as _Q, QgsMessageLog as _L
+            _L.logMessage(f'nie udało się ostylować izochron: {type(e).__name__}', 'AZO', _Q.MessageLevel.Info)
         return {self.OUTPUT: self._dest_id}

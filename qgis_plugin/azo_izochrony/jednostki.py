@@ -374,11 +374,19 @@ class PokrycieJednostkiAlgorithm(QgsProcessingAlgorithm):
             try:
                 from qgis.core import Qgis
                 ls.placement = Qgis.LabelPlacement.Horizontal
-            except Exception:
-                pass
+            except Exception as e:
+                # ⚠ Stylizacja wyniku to DODATEK — warstwa ma powstać nawet, gdy ostylowanie
+                #   padnie (inna wersja QGIS, brak atrybutu). Ale „padło i nikt się nie dowiedział"
+                #   to nie jest obsługa błędu: zapisujemy powód do logu QGIS-a.
+                from qgis.core import Qgis as _Q, QgsMessageLog as _L
+                _L.logMessage(f'nie udało się ustawić rozmieszczenia etykiet: {type(e).__name__}', 'AZO', _Q.MessageLevel.Info)
             layer.setLabeling(QgsVectorLayerSimpleLabeling(ls)); layer.setLabelsEnabled(True)
             layer.setName(self.tr('Pokrycie wg jednostek (%g min)') % self._maxT)
             layer.triggerRepaint()
-        except Exception:
-            pass
+        except Exception as e:
+            # ⚠ Stylizacja wyniku to DODATEK — warstwa ma powstać nawet, gdy ostylowanie
+            #   padnie (inna wersja QGIS, brak atrybutu). Ale „padło i nikt się nie dowiedział"
+            #   to nie jest obsługa błędu: zapisujemy powód do logu QGIS-a.
+            from qgis.core import Qgis as _Q, QgsMessageLog as _L
+            _L.logMessage(f'nie udało się ostylować pokrycia wg jednostek: {type(e).__name__}', 'AZO', _Q.MessageLevel.Info)
         return {self.OUTPUT: self._dest_id}
